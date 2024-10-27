@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 17:59:31
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-27 18:40:56
+ * @LastEditTime: 2024-10-27 19:57:37
 -->
 # WEB_BACKEND
 This is a backend project for WEB_CLASS. It is a simple project that uses Spring Boot and Spring Data JPA to manage a MySQL database.
@@ -15,9 +15,13 @@ This is a backend project for WEB_CLASS. It is a simple project that uses Spring
 
 ## PACKAGE STRUCTURE
 com.example.demo.controller: 存放所有的控制器
+
 com.example.demo.service: 存放所有的服务类
+
 com.example.demo.repository: 存放所有的仓库接口
+
 com.example.demo.model: 存放所有的实体类
+
 com.example.demo.config: 存放配置类
 
 ## Database Setup

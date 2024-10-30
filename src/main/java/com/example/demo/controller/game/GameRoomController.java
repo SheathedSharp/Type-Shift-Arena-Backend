@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-30 15:58:27
+ * @LastEditTime: 2024-10-30 16:26:01
  */
 package com.example.demo.controller.game;
 
@@ -19,6 +19,17 @@ import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.time.Instant;
+import java.util.stream.Collectors;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import java.util.stream.Collectors;
 
 @Controller
 public class GameRoomController {
@@ -129,5 +140,24 @@ public class GameRoomController {
                 }}
             );
         }
+    }
+
+    @GetMapping("/api/rooms/{roomId}/status")
+    public ResponseEntity<?> getRoomStatus(@PathVariable String roomId) {
+        GameRoom room = gameRoomService.getRoom(roomId);
+        if (room == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("roomId", room.getId());
+        response.put("players", new ArrayList<>(room.getPlayers()));
+        response.put("status", room.getStatus().toString().toLowerCase());
+        response.put("createdAt", room.getStartTime() != null ? 
+            Instant.ofEpochMilli(room.getStartTime()).toString() : 
+            Instant.now().toString());
+        response.put("maxPlayers", 2);
+
+        return ResponseEntity.ok(response);
     }
 }

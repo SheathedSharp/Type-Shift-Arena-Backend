@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 21:12:16
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-30 15:21:26
+ * @LastEditTime: 2024-10-30 16:30:29
  */
 package com.example.demo.config;
 
@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/api/rooms/*/status").permitAll()
                 .anyRequest().authenticated()
             )
             .build();

@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:45:53
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-30 13:58:41
+ * @LastEditTime: 2024-10-30 16:26:20
  */
 package com.example.demo.model.game;
 
@@ -21,6 +21,7 @@ public class GameRoom {
         this.players = new HashSet<>();
         this.status = GameStatus.WAITING;
         this.targetText = "The quick brown fox jumps over the lazy dog."; // 默认文本
+        this.startTime = System.currentTimeMillis();
     }
 
     // Getters and setters

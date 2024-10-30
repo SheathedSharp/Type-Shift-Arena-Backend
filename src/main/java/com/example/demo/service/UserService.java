@@ -2,14 +2,13 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 22:07:58
+ * @LastEditTime: 2024-10-27 18:20:27
  */
 package com.example.demo.service;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,9 +18,6 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -36,8 +32,6 @@ public class UserService {
     }
 
     public User saveUser(User user) {
-        // 加密密码
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 

@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 22:07:42
+ * @LastEditTime: 2024-10-27 18:30:53
  */
 package com.example.demo.model;
 
@@ -47,39 +47,6 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

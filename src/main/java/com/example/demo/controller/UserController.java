@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 18:20:34
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-27 18:37:15
+ * @LastEditTime: 2024-10-30 15:14:11
  */
 package com.example.demo.controller;
 
@@ -83,5 +83,19 @@ public class UserController {
                     return ResponseEntity.ok().build();
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/username/{username}")
+    @Operation(summary = "通过用户名获取用户信息")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "成功获取用户信息",
+            content = @Content(schema = @Schema(implementation = User.class))),
+        @ApiResponse(responseCode = "404", description = "用户不存在")
+    })
+    public ResponseEntity<?> getUserByUsername(
+        @Parameter(description = "用户名") @PathVariable String username) {
+        return userService.getUserByUsername(username)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 }

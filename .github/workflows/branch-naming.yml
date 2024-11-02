@@ -1,9 +1,6 @@
 name: Branch Naming Convention Check
 
 on:
-  create:
-    branches:
-      - '**'
   push:
     branches:
       - '**'

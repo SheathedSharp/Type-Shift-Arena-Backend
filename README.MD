@@ -2,9 +2,34 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 17:59:31
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-31 09:19:30
+ * @LastEditTime: 2024-11-02 23:55:02
 -->
+<div align="center">
+  
 # Type Shi(f)t Arena Backend
+
+<div>
+  <a href="README.MD">
+    <img src="https://img.shields.io/badge/English-README-blue.svg?style=for-the-badge" height="22px" />
+  </a>
+  <a href="README_CN.MD">
+    <img src="https://img.shields.io/badge/中文-说明文档-red.svg?style=for-the-badge" height="22px" />
+  </a>
+</div>
+
+<div style="margin-top: 5px">
+  <a href="CONTRIBUTING.MD">
+    <img src="https://img.shields.io/badge/English-Contributing-green.svg?style=for-the-badge" height="22px" />
+  </a>
+  <a href="CONTRIBUTING_CN.MD">
+    <img src="https://img.shields.io/badge/中文-贡献指南-yellow.svg?style=for-the-badge" height="22px" />
+  </a>
+</div>
+
+---
+
+</div>
+
 This is a backend project for Type Shi(f)t Arena. It is a simple project that uses Spring Boot and Spring Data JPA to manage a MySQL database.
 
 ## DEPENDENCIES
@@ -17,17 +42,17 @@ This is a backend project for Type Shi(f)t Arena. It is a simple project that us
 - Spring WebSocket
 
 ## PACKAGE STRUCTURE
-com.example.demo.controller: 存放所有的控制器
+com.example.demo.controller: The folder contains all application controllers
 
-com.example.demo.service: 存放所有的服务类
+com.example.demo.service: The folder contains all application services
 
-com.example.demo.repository: 存放所有的仓库接口
+com.example.demo.repository: The folder contains all application repositories
 
-com.example.demo.model: 存放所有的实体类
+com.example.demo.model: The folder contains all application models
 
-com.example.demo.config: 存放配置类
+com.example.demo.config: The folder contains all application configurations
 
-com.example.demo.security: 存放安全相关的类
+com.example.demo.security: The folder contains all application security related classes
 
 ## Database Setup
 
@@ -46,7 +71,7 @@ To initialize the database, follow these steps:
 
 ## Running the Application
 
-To run the application, use the following command.
+To run the application, use the following command. (Default is development environment)
 
 for development:
 ```bash
@@ -64,26 +89,3 @@ visit http://localhost:9090/hello to see the result.
 visit http://localhost:9090/swagger-ui.html to see the API documentation and test the API.
 
 waring: some API may not work because of the security configuration.
-
-
-## DEVELOPMENT PROCESS
-
-### develop new feature
-1. from develop branch create a new feature branch
-2. develop the feature in local development environment and test it
-3. push to remote repository, trigger test environment deployment
-4. verify the feature in test environment
-5. merge to develop branch
-
-### prepare for release
-1. verify the feature in test environment
-2. create a PR from develop to main
-3. verify the feature in test environment
-4. merge to main branch
-5. deploy to production environment
-
-### emergency fix
-1. from main branch create a new hotfix branch
-2. fix the issue in local hotfix environment and test it
-3. merge to main branch
-4. merge to develop branch

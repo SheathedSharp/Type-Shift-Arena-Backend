@@ -1,8 +1,8 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 21:17:38
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 21:17:45
+ * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
+ * @LastEditTime: 2024-11-02 00:04:23
  */
 package com.example.demo.controller;
 
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,6 +38,7 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Login", description = "Authenticates a user and returns a JWT token")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -57,6 +58,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Register", description = "Registers a new user")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         if (userService.existsByUsername(user.getUsername())) {

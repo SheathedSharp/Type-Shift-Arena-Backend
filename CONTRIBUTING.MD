@@ -2,11 +2,11 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-02 15:29:29
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-02 23:55:35
+ * @LastEditTime: 2024-11-02 23:55:27
 -->
 <div align="center">
   
-# 贡献指南
+# Contributing Guide
 
 <div>
   <a href="README.MD">
@@ -30,48 +30,48 @@
 
 </div>
 
-## 1. 本地分支同步及创建分支
+## 1. Local Branch Synchronization and Creation
 
--  拉取develop分支上的最新代码
+- Pull the latest code from the develop branch
 ```bash
 git pull origin develop
 ```
 
-- 从develop分支创建新的分支
+- Create a new branch from develop
 ```bash
 git checkout -b feature/xxxx
 ```
 
-> 注意：分支命名规范
-> - 新功能分支命名规范: `feature/功能描述`
-> - 例如: feature/user-login, feature/payment-integration
+> Note: Branch naming conventions
+> - New feature branch naming convention: `feature/feature-description`
+> - Example: feature/user-login, feature/payment-integration
 
-- 切换到新分支
+- Switch to the new branch
 ```bash
 git checkout feature/xxxx
 ```
 
-## 2. 开发过程
+## 2. Development Process
 
-- 添加修改过的文件
+- Add modified files
 ```bash
 git add .
 ```
 
-- 提交代码
+- Commit code
 ```bash
-git commit -m "描述"
+git commit -m "description"
 ```
 
-- 推送到远程分支
+- Push to remote branch
 ```bash
 git push origin feature/xxxx
 ```
 
-## 3. 在 GitHub 上创建 Pull Request
+## 3. Create Pull Request on GitHub
 
-- 创建 Pull Request
-- 将feature/xxxx 分支合并到 develop 分支
-- 等待代码 Review
-- 合并代码
-- 合并后删除 feature/xxxx 分支
+- Create Pull Request
+- Merge feature/xxxx branch into develop branch
+- Wait for code review
+- Merge code
+- Delete feature/xxxx branch after merging 

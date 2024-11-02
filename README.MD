@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 17:59:31
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 22:20:43
+ * @LastEditTime: 2024-10-31 09:19:30
 -->
 # Type Shi(f)t Arena Backend
 This is a backend project for Type Shi(f)t Arena. It is a simple project that uses Spring Boot and Spring Data JPA to manage a MySQL database.
@@ -64,3 +64,26 @@ visit http://localhost:9090/hello to see the result.
 visit http://localhost:9090/swagger-ui.html to see the API documentation and test the API.
 
 waring: some API may not work because of the security configuration.
+
+
+## DEVELOPMENT PROCESS
+
+### develop new feature
+1. from develop branch create a new feature branch
+2. develop the feature in local development environment and test it
+3. push to remote repository, trigger test environment deployment
+4. verify the feature in test environment
+5. merge to develop branch
+
+### prepare for release
+1. verify the feature in test environment
+2. create a PR from develop to main
+3. verify the feature in test environment
+4. merge to main branch
+5. deploy to production environment
+
+### emergency fix
+1. from main branch create a new hotfix branch
+2. fix the issue in local hotfix environment and test it
+3. merge to main branch
+4. merge to develop branch

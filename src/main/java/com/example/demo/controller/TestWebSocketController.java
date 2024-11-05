@@ -4,7 +4,7 @@
  * @LastEditors: hiddenSharp429 z404878860@163.com
  * @LastEditTime: 2024-10-29 23:30:57
  */
-package com.example.demo.controller.game;
+package com.example.demo.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;

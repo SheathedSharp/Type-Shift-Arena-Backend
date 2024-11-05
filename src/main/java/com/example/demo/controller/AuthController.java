@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,12 +42,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
         );
 
+        // 从认证结果中获取用户详细信息
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtTokenUtil.generateToken(userDetails);
 
@@ -54,8 +56,20 @@ public class AuthController {
         response.put("token", token);
         response.put("username", userDetails.getUsername());
 
+        // 根据用户名获取用户信息
+        Optional<User> user = userService.getUserByUsername(userDetails.getUsername());
+
+        // 添加用户id，进行空值校验
+        if (user.isPresent()) {
+            response.put("userId", user.get().getId());
+        } else {
+            // 如果用户信息为空，可以选择返回特定的错误信息或者其他处理方式
+            response.put("userId", "User not found");
+        }
+
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {

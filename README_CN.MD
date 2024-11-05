@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 17:59:31
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-02 23:55:31
+ * @LastEditTime: 2024-11-05 23:47:45
 -->
 <div align="center">
   
@@ -31,6 +31,47 @@
 </div>
 
 这是 Type Shi(f)t Arena 的后端项目。该项目使用 Spring Boot 和 Spring Data JPA 来管理 MySQL 数据库。
+
+## 添加环境变量
+在开发环境中有关数据库和JWT的配置均使用环境变量的方法进行配置，以防隐私泄露
+
+具体的代码如下：
+```
+# application-dev.properties
+......
+spring.datasource.url=${MYSQL_URL:jdbc:mysql://localhost:3306/myappdb}
+spring.datasource.username=${MYSQL_USERNAME}
+spring.datasource.password=${MYSQL_PASSWORD}
+.....
+.....
+jwt.secret=${JWT_SECRET:your_jwt_secret_key_should_be_at_least_256_bits_long_for_security}
+jwt.expiration=${JWT_EXPIRATION:86400}
+```
+
+对于Windows系统：
+1. 右键"此电脑" -> 属性
+2. 点击"高级系统设置"
+3. 点击"环境变量"按钮
+4. 在"系统变量"部分点击"新建"
+5. 添加以下变量：
+```
+MYSQL_USERNAME=你的数据库用户名
+MYSQL_PASSWORD=你的密码
+JWT_SECRET=你的密钥（非必要）
+JWT_EXPIRATION=你期望的到期时间（非必要）
+```
+
+对于Mac系统：
+1. 打开配置文件`nano ~/.zshrc`
+2. 添加以下内容
+```
+export MYSQL_USERNAME=你的数据库用户名
+export MYSQL_PASSWORD=你的密码
+export JWT_SECRET=你的密钥（非必要）
+export JWT_EXPIRATION=你期望到期的时间（非必要）
+```
+3. 保存文件并退出
+4. 重新加载配置`source ~/.zshrc`
 
 ## 依赖
 - Spring Boot 3.2.3

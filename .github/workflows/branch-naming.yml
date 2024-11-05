@@ -24,8 +24,8 @@ jobs:
           FEATURE_PATTERN="^feature/[a-z0-9-]+$"
           HOTFIX_PATTERN="^hotfix/[a-z0-9-]+$"
           
-          if [[ ! $BRANCH_NAME =~ $MAIN_BRANCHES ]] || \
-             [[ ! $BRANCH_NAME =~ $FEATURE_PATTERN ]] || \
+          if [[ ! $BRANCH_NAME =~ $MAIN_BRANCHES ]] && \
+             [[ ! $BRANCH_NAME =~ $FEATURE_PATTERN ]] && \
              [[ ! $BRANCH_NAME =~ $HOTFIX_PATTERN ]]; then
             echo "❌ Invalid branch name: $BRANCH_NAME"
             echo "Branch name '$BRANCH_NAME' does not follow the naming convention"

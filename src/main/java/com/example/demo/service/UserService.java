@@ -2,12 +2,14 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 22:07:58
+ * @LastEditTime: 2024-11-06 11:26:32
  */
 package com.example.demo.service;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.model.PlayerProfile;
+import com.example.demo.repository.PlayerProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private PlayerProfileRepository playerProfileRepository;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -38,7 +43,16 @@ public class UserService {
     public User saveUser(User user) {
         // 加密密码
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        
+        // 保存用户
+        User savedUser = userRepository.save(user);
+
+        // 创建并初始化玩家资料
+        PlayerProfile profile = new PlayerProfile();
+        profile.setUser(savedUser);
+        playerProfileRepository.save(profile);
+
+        return savedUser;
     }
 
     public void deleteUser(Long id) {

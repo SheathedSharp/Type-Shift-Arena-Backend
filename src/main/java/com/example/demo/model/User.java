@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 22:07:42
+ * @LastEditTime: 2024-11-06 09:03:47
  */
 package com.example.demo.model;
 
@@ -24,6 +24,9 @@ public class User {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(name = "imgSrc")  
+    private String imgSrc = "https://api.dicebear.com/7.x/avataaars/svg?seed=";  // 使用 DiceBear API 生成默认头像
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -64,6 +67,14 @@ public class User {
         this.password = password;
     }
 
+    public String getImgSrc() {
+        return imgSrc;
+    }
+
+    public void setImgSrc(String imgSrc) {
+        this.imgSrc = imgSrc;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -83,6 +94,10 @@ public class User {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        // 设置随机默认头像
+        if (imgSrc.equals("https://api.dicebear.com/7.x/avataaars/svg?seed=")) {
+            imgSrc += username;  // 使用用户名作为种子生成唯一头像
+        }
     }
 
     @PreUpdate

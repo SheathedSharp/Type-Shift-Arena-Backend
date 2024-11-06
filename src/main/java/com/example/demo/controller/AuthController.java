@@ -1,8 +1,8 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 21:17:38
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2024-11-02 00:04:23
+ * @LastEditors: hiddenSharp429 z404878860@163.com
+ * @LastEditTime: 2024-11-06 10:43:57
  */
 package com.example.demo.controller;
 
@@ -59,14 +59,8 @@ public class AuthController {
 
         // 根据用户名获取用户信息
         Optional<User> user = userService.getUserByUsername(userDetails.getUsername());
-
-        // 添加用户id，进行空值校验
-        if (user.isPresent()) {
-            response.put("userId", user.get().getId());
-        } else {
-            // 如果用户信息为空，可以选择返回特定的错误信息或者其他处理方式
-            response.put("userId", "User not found");
-        }
+        response.put("imgSrc", user.get().getImgSrc());
+        response.put("userId", user.get().getId());
 
         return ResponseEntity.ok(response);
     }

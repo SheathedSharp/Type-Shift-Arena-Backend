@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 21:12:16
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-31 21:57:57
+ * @LastEditTime: 2024-11-06 12:58:11
  */
 package com.example.demo.config;
 
@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**").permitAll()
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("api/players/**").permitAll()
                 .requestMatchers("/hello").permitAll()
                 .anyRequest().authenticated()
             )

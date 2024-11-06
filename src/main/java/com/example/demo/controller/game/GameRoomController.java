@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-30 16:26:01
+ * @LastEditTime: 2024-11-06 13:01:12
  */
 package com.example.demo.controller.game;
 
@@ -18,6 +18,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
@@ -26,10 +29,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.time.Instant;
 import java.util.stream.Collectors;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import java.util.stream.Collectors;
+import io.swagger.v3.oas.annotations.Operation;
 
 @Controller
 public class GameRoomController {
@@ -142,6 +143,7 @@ public class GameRoomController {
         }
     }
 
+    @Operation(summary = "Get the status of a game room", description = "Returns the status of the game room with the provided ID")
     @GetMapping("/api/rooms/{roomId}/status")
     public ResponseEntity<?> getRoomStatus(@PathVariable String roomId) {
         GameRoom room = gameRoomService.getRoom(roomId);

@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 17:59:31
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-02 23:55:02
+ * @LastEditTime: 2024-11-05 23:50:47
 -->
 <div align="center">
   
@@ -31,6 +31,50 @@
 </div>
 
 This is a backend project for Type Shi(f)t Arena. It is a simple project that uses Spring Boot and Spring Data JPA to manage a MySQL database.
+
+## Adding Environment Variables
+In the development environment, database and JWT configurations use environment variables to prevent privacy leaks.
+
+The specific code is as follows:
+```
+# application-dev.properties
+......
+spring.datasource.url=${MYSQL_URL:jdbc:mysql://localhost:3306/myappdb}
+spring.datasource.username=${MYSQL_USERNAME}
+spring.datasource.password=${MYSQL_PASSWORD}
+.....
+.....
+jwt.secret=${JWT_SECRET:your_jwt_secret_key_should_be_at_least_256_bits_long_for_security}
+jwt.expiration=${JWT_EXPIRATION:86400}
+```
+
+For Windows:
+
+1. Right-click "This PC" -> Properties
+2. Click "Advanced system settings"
+3. Click "Environment Variables" button
+4. Click "New" in the "System Variables" section
+5. Add the following variables:
+```
+MYSQL_USERNAME=your_database_username
+MYSQL_PASSWORD=your_password
+JWT_SECRET=your_secret_key (optional)
+JWT_EXPIRATION=your_desired_expiration_time (optional)
+```
+
+For Mac:
+
+1. Open configuration file `nano ~/.zshrc`
+2. Add the following content:
+```
+export MYSQL_USERNAME=your_database_username
+export MYSQL_PASSWORD=your_password
+export JWT_SECRET=your_secret_key (optional)
+export JWT_EXPIRATION=your_desired_expiration_time (optional)
+```
+
+3. Save and exit the file
+4. Reload configuration with source ~/.zshrc
 
 ## DEPENDENCIES
 - Spring Boot 3.2.3

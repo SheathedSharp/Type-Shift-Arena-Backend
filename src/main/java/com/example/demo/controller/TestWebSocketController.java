@@ -4,7 +4,7 @@
  * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @LastEditTime: 2024-11-02 00:04:28
  */
-package com.example.demo.controller.game;
+package com.example.demo.controller;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;

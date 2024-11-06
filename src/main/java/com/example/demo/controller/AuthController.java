@@ -1,8 +1,8 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 21:17:38
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2024-11-02 00:04:23
+ * @LastEditors: hiddenSharp429 z404878860@163.com
+ * @LastEditTime: 2024-11-06 10:43:57
  */
 package com.example.demo.controller;
 
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -42,18 +43,24 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
         );
 
+        // 从认证结果中获取用户详细信息
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtTokenUtil.generateToken(userDetails);
 
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         response.put("username", userDetails.getUsername());
+
+        // 根据用户名获取用户信息
+        Optional<User> user = userService.getUserByUsername(userDetails.getUsername());
+        response.put("imgSrc", user.get().getImgSrc());
+        response.put("userId", user.get().getId());
 
         return ResponseEntity.ok(response);
     }

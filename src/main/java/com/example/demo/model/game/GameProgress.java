@@ -4,7 +4,7 @@
  * @LastEditors: hiddenSharp429 z404878860@163.com
  * @LastEditTime: 2024-10-28 20:03:23
  */
-package com.example.demo.model;
+package com.example.demo.model.game;
 
 public class GameProgress {
     private String playerId;

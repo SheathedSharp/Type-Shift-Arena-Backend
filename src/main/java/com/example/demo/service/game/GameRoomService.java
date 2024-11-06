@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-30 13:58:26
+ * @LastEditTime: 2024-11-06 21:29:07
  */
 package com.example.demo.service.game;
 
@@ -30,13 +30,13 @@ public class GameRoomService {
         return rooms.get(roomId);
     }
 
-    public GameRoom joinRoom(String roomId, String playerId) {
+    public GameRoom joinRoom(String roomId, String playerId, String playerName) {
         GameRoom room = rooms.get(roomId);
         if (room == null) {
             room = createRoom(roomId);
         }
         
-        room.addPlayer(playerId);
+        room.addPlayer(playerId, playerName);
         
         if (room.isFull()) {
             room.setStatus(GameStatus.READY);
@@ -45,12 +45,13 @@ public class GameRoomService {
         return room;
     }
 
-    public void leaveRoom(String roomId, String playerId) {
+    public void leaveRoom(String roomId, String playerId, String playerName) {
         GameRoom room = rooms.get(roomId);
         if (room != null) {
-            room.getPlayers().remove(playerId);
+            room.getPlayersId().remove(playerId);
+            room.getPlayersName().remove(playerName);
             
-            if (room.getPlayers().isEmpty()) {
+            if (room.getPlayersId().isEmpty()) {
                 rooms.remove(roomId);
             } else {
                 room.setStatus(GameStatus.WAITING);

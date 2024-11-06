@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-06 13:01:12
+ * @LastEditTime: 2024-11-06 21:32:13
  */
 package com.example.demo.controller.game;
 
@@ -45,7 +45,7 @@ public class GameRoomController {
     @MessageMapping("/room/{roomId}/join")
     public void joinRoom(@DestinationVariable String roomId, GameMessage message) {
         logger.info("Player {} joining room {}", message.getPlayerId(), roomId);
-        GameRoom room = gameRoomService.joinRoom(roomId, message.getPlayerId());
+        GameRoom room = gameRoomService.joinRoom(roomId, message.getPlayerId(), message.getPlayerName());
         
         // Broadcast the join event to all players in the room
         messagingTemplate.convertAndSend(
@@ -53,6 +53,7 @@ public class GameRoomController {
             new GameMessage() {{
                 setType("PLAYER_JOIN");
                 setPlayerId(message.getPlayerId());
+                setPlayerName(message.getPlayerName());
                 setTimestamp(message.getTimestamp());
             }}
         );
@@ -76,7 +77,7 @@ public class GameRoomController {
     @MessageMapping("/room/{roomId}/leave")
     public void leaveRoom(@DestinationVariable String roomId, GameMessage message) {
         logger.info("Player {} leaving room {}", message.getPlayerId(), roomId);
-        gameRoomService.leaveRoom(roomId, message.getPlayerId());
+        gameRoomService.leaveRoom(roomId, message.getPlayerId(), message.getPlayerName());
         
         // Broadcast the leave event
         messagingTemplate.convertAndSend(
@@ -153,7 +154,8 @@ public class GameRoomController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("roomId", room.getId());
-        response.put("players", new ArrayList<>(room.getPlayers()));
+        response.put("playersId", new ArrayList<>(room.getPlayersId()));
+        response.put("playersName", new ArrayList<>(room.getPlayersName()));
         response.put("status", room.getStatus().toString().toLowerCase());
         response.put("createdAt", room.getStartTime() != null ? 
             Instant.ofEpochMilli(room.getStartTime()).toString() : 

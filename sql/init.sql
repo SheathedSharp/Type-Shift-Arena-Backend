@@ -23,3 +23,11 @@ CREATE TABLE IF NOT EXISTS player_profile (
     matchesPlayed INT DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS user_friends (
+    user_id BIGINT,
+    friend_id BIGINT,
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (friend_id) REFERENCES users(id)
+);

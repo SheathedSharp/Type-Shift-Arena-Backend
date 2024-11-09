@@ -2,9 +2,9 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-07 08:26:55
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-07 08:27:04
+ * @LastEditTime: 2024-11-09 18:06:56
  */
-package com.example.demo.service;
+package com.example.demo.service.user;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;

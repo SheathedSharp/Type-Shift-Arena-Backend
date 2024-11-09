@@ -2,9 +2,9 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-07 08:48:13
+ * @LastEditTime: 2024-11-09 18:02:46
  */
-package com.example.demo.model;
+package com.example.demo.model.user;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

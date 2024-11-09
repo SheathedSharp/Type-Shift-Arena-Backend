@@ -2,9 +2,9 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-06 10:53:19
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-06 11:36:51
+ * @LastEditTime: 2024-11-09 18:07:01
  */
-package com.example.demo.service;
+package com.example.demo.service.user;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;

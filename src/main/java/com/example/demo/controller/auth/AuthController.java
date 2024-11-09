@@ -2,9 +2,9 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 21:17:38
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-06 10:43:57
+ * @LastEditTime: 2024-11-09 18:01:00
  */
-package com.example.demo.controller;
+package com.example.demo.controller.auth;
 
 import com.example.demo.model.User;
 import com.example.demo.security.JwtTokenUtil;

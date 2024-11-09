@@ -1,10 +1,10 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 18:20:34
- * @LastEditors: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
- * @LastEditTime: 2024-11-02 00:04:55
+ * @LastEditors: hiddenSharp429 z404878860@163.com
+ * @LastEditTime: 2024-11-09 18:02:04
  */
-package com.example.demo.controller;
+package com.example.demo.controller.user;
 
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;

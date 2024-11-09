@@ -4,7 +4,8 @@
  * @LastEditors: hiddenSharp429 z404878860@163.com
  * @LastEditTime: 2024-11-07 09:08:01
  */
-package com.example.demo.dto;
+package com.example.demo.core;
+/*package com.example.demo.dto;*/
 
 public class ApiResponse<T> {
     private int status;
@@ -26,7 +27,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(200, message, data);
+        return new ApiResponse<>(0, message, data);
     }
 
     // 错误响应的静态工厂方法

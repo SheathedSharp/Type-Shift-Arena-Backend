@@ -9,7 +9,8 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.service.FriendService;
 import com.example.demo.dto.FriendDTO;
-import com.example.demo.dto.ApiResponse;
+//这里对应ApiResponse的import语句，我这里显示这样改是对的
+import com.example.demo.core.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

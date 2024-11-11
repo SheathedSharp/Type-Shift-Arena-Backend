@@ -2,11 +2,11 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-07 08:26:55
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-09 18:06:56
+ * @LastEditTime: 2024-11-10 10:46:38
  */
 package com.example.demo.service.user;
 
-import com.example.demo.model.User;
+import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -2,12 +2,12 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-06 10:52:43
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-06 11:35:47
+ * @LastEditTime: 2024-11-11 11:00:03
  */
-package com.example.demo.controller;
+package com.example.demo.controller.user;
 
-import com.example.demo.model.PlayerProfile;
-import com.example.demo.service.PlayerProfileService;  // 添加这行
+import com.example.demo.entity.PlayerProfile;
+import com.example.demo.service.user.PlayerProfileService; 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +40,9 @@ public class PlayerProfileController {
         return playerProfileService.updatePlayerStats(id, speed, isVictory, accuracy);
     }
 
-    @Operation(summary = "Get user level", description = "Returns the user level as per the id")
-    @GetMapping("/{id}/level")
-    public String getUserLevel(@PathVariable Long id) {
-        return playerProfileService.getUserLevel(id);
-    }
+    // @Operation(summary = "Get user level", description = "Returns the user level as per the id")
+    // @GetMapping("/{id}/level")
+    // public String getUserLevel(@PathVariable Long id) {
+    //     return playerProfileService.getUserLevel(id);
+    // }
 }

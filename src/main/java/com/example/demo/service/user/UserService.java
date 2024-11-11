@@ -2,13 +2,13 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-09 18:07:06
+ * @LastEditTime: 2024-11-10 10:41:52
  */
 package com.example.demo.service.user;
 
-import com.example.demo.model.User;
+import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.model.PlayerProfile;
+import com.example.demo.entity.PlayerProfile;
 import com.example.demo.repository.PlayerProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

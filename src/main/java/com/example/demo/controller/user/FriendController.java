@@ -2,13 +2,13 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-07 08:27:08
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-07 09:08:37
+ * @LastEditTime: 2024-11-10 10:50:39
  */
-package com.example.demo.controller;
+package com.example.demo.controller.user;
 
-import com.example.demo.model.User;
-import com.example.demo.service.FriendService;
-import com.example.demo.dto.FriendDTO;
+import com.example.demo.entity.User;
+import com.example.demo.service.user.FriendService;
+import com.example.demo.model.dto.FriendDTO;
 //这里对应ApiResponse的import语句，我这里显示这样改是对的
 import com.example.demo.core.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;

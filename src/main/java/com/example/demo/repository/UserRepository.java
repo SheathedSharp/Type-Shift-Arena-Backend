@@ -2,11 +2,11 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-07 08:27:33
+ * @LastEditTime: 2024-11-10 10:40:47
  */
 package com.example.demo.repository;
 
-import com.example.demo.model.User;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

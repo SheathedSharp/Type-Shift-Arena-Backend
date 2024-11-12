@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-06 21:29:07
+ * @LastEditTime: 2024-11-10 12:38:46
  */
 package com.example.demo.service.game;
 
@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameRoomService {
     private final Map<String, GameRoom> rooms = new ConcurrentHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameRoomService.class);
+    private static final int MAX_PLAYERS = 2;
 
     public GameRoom createRoom(String roomId) {
         GameRoom room = new GameRoom(roomId);
@@ -36,10 +37,10 @@ public class GameRoomService {
             room = createRoom(roomId);
         }
         
-        room.addPlayer(playerId, playerName);
-        
-        if (room.isFull()) {
-            room.setStatus(GameStatus.READY);
+        if (addPlayer(room, playerId, playerName)) {
+            if (isRoomFull(room)) {
+                setGameStatus(room, GameStatus.READY);
+            }
         }
         
         return room;
@@ -48,13 +49,10 @@ public class GameRoomService {
     public void leaveRoom(String roomId, String playerId, String playerName) {
         GameRoom room = rooms.get(roomId);
         if (room != null) {
-            room.getPlayersId().remove(playerId);
-            room.getPlayersName().remove(playerName);
-            
-            if (room.getPlayersId().isEmpty()) {
+            if (removePlayer(room, playerId, playerName)) {
                 rooms.remove(roomId);
             } else {
-                room.setStatus(GameStatus.WAITING);
+                setGameStatus(room, GameStatus.WAITING);
             }
         }
     }
@@ -66,7 +64,46 @@ public class GameRoomService {
     public void updateGameStatus(String roomId, GameStatus status) {
         GameRoom room = rooms.get(roomId);
         if (room != null) {
-            room.setStatus(status);
+            setGameStatus(room, status);
         }
+    }
+
+    public void setGameStatus(GameRoom room, GameStatus status) {
+        room.setStatus(status);
+        if (status == GameStatus.PLAYING) {
+            room.setStartTime(System.currentTimeMillis());
+        }
+    }
+
+    public boolean addPlayer(GameRoom room, String playerId, String playerName) {
+        if (!isRoomFull(room)) {
+            room.getPlayersId().add(playerId);
+            room.getPlayersName().add(playerName);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removePlayer(GameRoom room, String playerId, String playerName) {
+        room.getPlayersId().remove(playerId);
+        room.getPlayersName().remove(playerName);
+        return room.getPlayersId().isEmpty();
+    }
+
+    public boolean isRoomFull(GameRoom room) {
+        return room.getPlayersId().size() >= MAX_PLAYERS;
+    }
+
+    public boolean isRoomEmpty(GameRoom room) {
+        return room.getPlayersId().isEmpty();
+    }
+
+    public boolean isPlayerHost(GameRoom room, String playerId) {
+        return !room.getPlayersId().isEmpty() && 
+               room.getPlayersId().iterator().next().equals(playerId);
+    }
+
+    public boolean hasPlayer(GameRoom room, String playerId) {
+        return room.getPlayersId().contains(playerId);
     }
 }

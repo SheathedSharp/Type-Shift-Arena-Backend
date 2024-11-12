@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 17:59:31
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-05 23:47:45
+ * @LastEditTime: 2024-11-11 20:06:30
 -->
 <div align="center">
   
@@ -24,6 +24,16 @@
   <a href="CONTRIBUTING_CN.MD">
     <img src="https://img.shields.io/badge/中文-贡献指南-yellow.svg?style=for-the-badge" height="22px" />
   </a>
+</div>
+
+<div style="margin-top: 5px">
+  <a href="project-architecture.md">
+    <img src="https://img.shields.io/badge/English-PROJUCT ARCHITECTURE-brown.svg?style=for-the-badge" height="22px" />
+  </a>
+  <a href="project-architecture_cn.md">
+    <img src="https://img.shields.io/badge/中文-项目结构-black.svg?style=for-the-badge" height="22px" />
+  </a>
+  
 </div>
 
 ---
@@ -81,19 +91,6 @@ export JWT_EXPIRATION=你期望到期的时间（非必要）
 - JWT
 - Spring Security
 - Spring WebSocket
-
-## 包结构
-com.example.demo.controller: 包含所有应用控制器
-
-com.example.demo.service: 包含所有应用服务
-
-com.example.demo.repository: 包含所有应用数据仓库
-
-com.example.demo.model: 包含所有应用模型
-
-com.example.demo.config: 包含所有应用配置
-
-com.example.demo.security: 包含所有应用安全相关类
 
 ## 数据库设置
 

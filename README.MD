@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 17:59:31
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-05 23:50:47
+ * @LastEditTime: 2024-11-11 20:06:25
 -->
 <div align="center">
   
@@ -24,6 +24,18 @@
   <a href="CONTRIBUTING_CN.MD">
     <img src="https://img.shields.io/badge/中文-贡献指南-yellow.svg?style=for-the-badge" height="22px" />
   </a>
+  
+</div>
+
+
+<div style="margin-top: 5px">
+  <a href="project-architecture.md">
+    <img src="https://img.shields.io/badge/English-PROJUCT ARCHITECTURE-brown.svg?style=for-the-badge" height="22px" />
+  </a>
+  <a href="project-architecture_cn.md">
+    <img src="https://img.shields.io/badge/中文-项目结构-black.svg?style=for-the-badge" height="22px" />
+  </a>
+  
 </div>
 
 ---
@@ -84,19 +96,6 @@ export JWT_EXPIRATION=your_desired_expiration_time (optional)
 - JWT
 - Spring Security
 - Spring WebSocket
-
-## PACKAGE STRUCTURE
-com.example.demo.controller: The folder contains all application controllers
-
-com.example.demo.service: The folder contains all application services
-
-com.example.demo.repository: The folder contains all application repositories
-
-com.example.demo.model: The folder contains all application models
-
-com.example.demo.config: The folder contains all application configurations
-
-com.example.demo.security: The folder contains all application security related classes
 
 ## Database Setup
 

@@ -2,11 +2,11 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-07 08:48:34
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-07 08:56:41
+ * @LastEditTime: 2024-11-10 10:40:30
  */
-package com.example.demo.dto;
+package com.example.demo.model.dto;
 
-import com.example.demo.model.User;
+import com.example.demo.entity.User;
 
 public class FriendDTO {
     private Long id;

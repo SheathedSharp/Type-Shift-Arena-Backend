@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-06 21:32:13
+ * @LastEditTime: 2024-11-10 13:02:28
  */
 package com.example.demo.controller.game;
 
@@ -45,30 +45,32 @@ public class GameRoomController {
     @MessageMapping("/room/{roomId}/join")
     public void joinRoom(@DestinationVariable String roomId, GameMessage message) {
         logger.info("Player {} joining room {}", message.getPlayerId(), roomId);
+
         GameRoom room = gameRoomService.joinRoom(roomId, message.getPlayerId(), message.getPlayerName());
         
-        // Broadcast the join event to all players in the room
+        // 广播玩家加入消息
         messagingTemplate.convertAndSend(
             "/topic/room/" + roomId,
             new GameMessage() {{
                 setType("PLAYER_JOIN");
                 setPlayerId(message.getPlayerId());
                 setPlayerName(message.getPlayerName());
-                setTimestamp(message.getTimestamp());
+                setRoomStatus(room.getStatus().toString());
+                setPlayersCount(room.getPlayersId().size());
+                setTimestamp(System.currentTimeMillis());
             }}
         );
-
-        // Check if the room is full, if so, start the game automatically
-        if (room.isFull()) {
-            logger.info("Room {} is full, starting game automatically", roomId);
-            room.setStatus(GameStatus.PLAYING);
-            
-            // Broadcast game start
+        
+        // 如果房间满员，自动准备
+        if (gameRoomService.isRoomFull(room)) {
+            gameRoomService.setGameStatus(room, GameStatus.READY);
             messagingTemplate.convertAndSend(
                 "/topic/room/" + roomId,
                 new GameMessage() {{
-                    setType("GAME_START");
-                    setTimestamp(new Date().toInstant().toString());
+                    setType("GAME_READY");
+                    setRoomStatus(GameStatus.READY.toString());
+                    setTargetText(room.getTargetText());
+                    setTimestamp(System.currentTimeMillis());
                 }}
             );
         }
@@ -76,15 +78,17 @@ public class GameRoomController {
 
     @MessageMapping("/room/{roomId}/leave")
     public void leaveRoom(@DestinationVariable String roomId, GameMessage message) {
-        logger.info("Player {} leaving room {}", message.getPlayerId(), roomId);
+        logger.info("Player {} ({}) leaving room {}", message.getPlayerName(), message.getPlayerId(), roomId);
+       
         gameRoomService.leaveRoom(roomId, message.getPlayerId(), message.getPlayerName());
-        
-        // Broadcast the leave event
+
+        // 广播玩家离开消息
         messagingTemplate.convertAndSend(
             "/topic/room/" + roomId,
             new GameMessage() {{
                 setType("PLAYER_LEAVE");
                 setPlayerId(message.getPlayerId());
+                setPlayerName(message.getPlayerName());
                 setTimestamp(message.getTimestamp());
             }}
         );
@@ -93,16 +97,21 @@ public class GameRoomController {
     @MessageMapping("/room/{roomId}/start")
     public void startGame(@DestinationVariable String roomId, GameMessage message) {
         logger.info("Starting game in room {}", roomId);
+
         GameRoom room = gameRoomService.getRoom(roomId);
-        if (room != null && room.isFull()) {
+
+        if (room != null && gameRoomService.isPlayerHost(room, message.getPlayerId())) {
             room.setStatus(GameStatus.PLAYING);
             
-            // Broadcast game start
+            // 广播游戏开始
             messagingTemplate.convertAndSend(
                 "/topic/room/" + roomId,
                 new GameMessage() {{
                     setType("GAME_START");
-                    setTimestamp(message.getTimestamp());
+                    setRoomStatus(GameStatus.PLAYING.toString());
+                    setStartTime(room.getStartTime());
+                    setTargetText(room.getTargetText());
+                    setTimestamp(System.currentTimeMillis());
                 }}
             );
         }

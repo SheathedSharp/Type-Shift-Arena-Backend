@@ -2,13 +2,13 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 21:17:38
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-06 10:43:57
+ * @LastEditTime: 2024-11-10 10:51:58
  */
-package com.example.demo.controller;
+package com.example.demo.controller.auth;
 
-import com.example.demo.model.User;
+import com.example.demo.entity.User;
 import com.example.demo.security.JwtTokenUtil;
-import com.example.demo.service.UserService;
+import com.example.demo.service.user.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

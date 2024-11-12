@@ -2,11 +2,11 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 22:06:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 22:07:19
+ * @LastEditTime: 2024-11-10 10:49:49
  */
 package com.example.demo.security;
 
-import com.example.demo.model.User;
+import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

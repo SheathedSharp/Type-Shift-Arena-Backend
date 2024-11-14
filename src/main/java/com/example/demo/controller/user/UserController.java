@@ -2,12 +2,14 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 18:20:34
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-10 10:52:38
+ * @LastEditTime: 2024-11-14 22:21:56
  */
 package com.example.demo.controller.user;
 
 import com.example.demo.entity.User;
+import com.example.demo.model.dto.UserDTO;
 import com.example.demo.service.user.UserService;
+import com.example.demo.core.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,9 +34,10 @@ public class UserController {
 
     @Operation(summary = "Get a user by ID", description = "Returns a user as per the id")
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@Parameter(description = "ID of user to be searched") @PathVariable Long id) {
+    public ResponseEntity<ApiResponse<UserDTO>> getUserById(
+            @Parameter(description = "ID of user to be searched") @PathVariable Long id) {
         return userService.getUserById(id)
-                .map(ResponseEntity::ok)
+                .map(user -> ResponseEntity.ok(ApiResponse.success("User found successfully", new UserDTO(user))))
                 .orElse(ResponseEntity.notFound().build());
     }
 
@@ -78,10 +81,10 @@ public class UserController {
     
     @GetMapping("/username/{username}")
     @Operation(summary = "Get user by username", description = "Returns a user as per the username")
-    public ResponseEntity<?> getUserByUsername(
-        @Parameter(description = "Username") @PathVariable String username) {
+    public ResponseEntity<ApiResponse<UserDTO>> getUserByUsername(
+            @Parameter(description = "Username") @PathVariable String username) {
         return userService.getUserByUsername(username)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(user -> ResponseEntity.ok(ApiResponse.success("User found successfully", new UserDTO(user))))
+                .orElse(ResponseEntity.notFound().build());
     }
 }

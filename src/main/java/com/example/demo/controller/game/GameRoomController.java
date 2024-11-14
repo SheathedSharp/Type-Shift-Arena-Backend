@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-10 13:02:28
+ * @LastEditTime: 2024-11-14 11:07:23
  */
 package com.example.demo.controller.game;
 
@@ -10,6 +10,8 @@ import com.example.demo.model.game.GameRoom;
 import com.example.demo.model.game.GameStatus;
 import com.example.demo.model.game.GameMessage;
 import com.example.demo.service.game.GameRoomService;
+import com.example.demo.entity.enums.TextLanguage;
+import com.example.demo.entity.enums.TextCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -44,9 +46,29 @@ public class GameRoomController {
 
     @MessageMapping("/room/{roomId}/join")
     public void joinRoom(@DestinationVariable String roomId, GameMessage message) {
-        logger.info("Player {} joining room {}", message.getPlayerId(), roomId);
+        logger.info("Player {} joining room {} with language={}, category={}, difficulty={}",
+            message.getPlayerId(), roomId, message.getLanguage(), 
+            message.getCategory(), message.getDifficulty());
 
-        GameRoom room = gameRoomService.joinRoom(roomId, message.getPlayerId(), message.getPlayerName());
+        // 将字符串转换为枚举
+        TextLanguage language = TextLanguage.valueOf(
+            message.getLanguage() != null ? message.getLanguage() : "ENGLISH"
+        );
+        TextCategory category = TextCategory.valueOf(
+            message.getCategory() != null ? message.getCategory() : "DAILY_CHAT"
+        );
+        String difficulty = message.getDifficulty() != null ? 
+            message.getDifficulty() : "EASY";
+
+        // 使用新的 joinRoom 方法
+        GameRoom room = gameRoomService.joinRoom(
+            roomId,
+            message.getPlayerId(),
+            message.getPlayerName(),
+            language,
+            category,
+            difficulty
+        );
         
         // 广播玩家加入消息
         messagingTemplate.convertAndSend(
@@ -57,6 +79,10 @@ public class GameRoomController {
                 setPlayerName(message.getPlayerName());
                 setRoomStatus(room.getStatus().toString());
                 setPlayersCount(room.getPlayersId().size());
+                setLanguage(language.toString());
+                setCategory(category.toString());
+                setDifficulty(difficulty);
+                setTargetText(room.getTargetText()); // 添加目标文本
                 setTimestamp(System.currentTimeMillis());
             }}
         );

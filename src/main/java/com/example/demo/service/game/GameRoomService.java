@@ -2,16 +2,21 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-10 12:38:46
+ * @LastEditTime: 2024-11-14 07:59:08
  */
 package com.example.demo.service.game;
 
 import com.example.demo.model.game.GameRoom;
 import com.example.demo.model.game.GameStatus;
+import com.example.demo.entity.enums.TextLanguage;
+import com.example.demo.entity.enums.TextCategory;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,20 +26,44 @@ public class GameRoomService {
     private static final Logger logger = LoggerFactory.getLogger(GameRoomService.class);
     private static final int MAX_PLAYERS = 2;
 
-    public GameRoom createRoom(String roomId) {
+    @Autowired
+    private GameTextService gameTextService;
+
+    // public GameRoom createRoom(String roomId) {
+    //     GameRoom room = new GameRoom(roomId);
+    //     String targetText = gameTextService.getRandomText(difficulty, category);
+    //     room.setTargetText(targetText);
+    //     rooms.put(roomId, room);
+    //     return room;
+    // }
+    public GameRoom createRoom(String roomId, TextLanguage language, TextCategory category, String difficulty) {
         GameRoom room = new GameRoom(roomId);
+        String targetText = gameTextService.getRandomText(language, category, difficulty);
+        room.setTargetText(targetText);
         rooms.put(roomId, room);
         return room;
+    }
+
+    // 添加一个使用默认参数的重载方法
+    public GameRoom createRoom(String roomId) {
+        return createRoom(
+            roomId,
+            TextLanguage.ENGLISH,  // 默认使用英语
+            TextCategory.DAILY_CHAT,  // 默认使用日常对话
+            "EASY"  // 默认使用简单难度
+        );
     }
 
     public GameRoom getRoom(String roomId) {
         return rooms.get(roomId);
     }
 
-    public GameRoom joinRoom(String roomId, String playerId, String playerName) {
+    public GameRoom joinRoom(String roomId, String playerId, String playerName, 
+                            TextLanguage language, TextCategory category, String difficulty) {
         GameRoom room = rooms.get(roomId);
         if (room == null) {
-            room = createRoom(roomId);
+            // 使用传入的参数创建房间
+            room = createRoom(roomId, language, category, difficulty);
         }
         
         if (addPlayer(room, playerId, playerName)) {
@@ -44,6 +73,18 @@ public class GameRoomService {
         }
         
         return room;
+    }
+
+    // 添加一个使用默认参数的重载方法
+    public GameRoom joinRoom(String roomId, String playerId, String playerName) {
+        return joinRoom(
+            roomId,
+            playerId,
+            playerName,
+            TextLanguage.ENGLISH,  // 默认使用英语
+            TextCategory.DAILY_CHAT,  // 默认使用日常对话
+            "EASY"  // 默认使用简单难度
+        );
     }
 
     public void leaveRoom(String roomId, String playerId, String playerName) {

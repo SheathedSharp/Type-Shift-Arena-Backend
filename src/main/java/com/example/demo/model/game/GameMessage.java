@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-06 18:19:04
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-11 15:57:37
+ * @LastEditTime: 2024-11-14 22:56:17
  */
 package com.example.demo.model.game;
 
@@ -23,11 +23,15 @@ public class GameMessage {
     private String playerId;
     private String playerName;
     private Double percentage;
-    private String message;        
+    private String message;
+    private String roomId;     // 添加房间ID属性        
     private String roomStatus;    // 房间状态
     private String targetText;    // 目标文本
     private int playersCount;     // 玩家数量
     private Long startTime;       // 游戏开始时间
+    private String language;    // 对应 TextLanguage
+    private String category;    // 对应 TextCategory 
+    private String difficulty; // 难度级别
     @JsonDeserialize(using = CustomTimestampDeserializer.class) // 使用自定义的时间戳反序列化器将时间戳转换为Long类型
     private Long timestamp;
 }

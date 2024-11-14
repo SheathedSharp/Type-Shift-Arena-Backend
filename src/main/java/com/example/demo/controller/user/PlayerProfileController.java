@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-06 10:52:43
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-11 11:00:03
+ * @LastEditTime: 2024-11-14 22:00:55
  */
 package com.example.demo.controller.user;
 
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import io.swagger.v3.oas.annotations.Operation;
+import com.example.demo.model.dto.PlayerProfileDTO;
 
 
 @RestController
@@ -26,8 +27,9 @@ public class PlayerProfileController {
     
     @Operation(summary = "Get a player profile by ID", description = "Returns a player profile as per the id")
     @GetMapping("/{id}")
-    public PlayerProfile getPlayerProfile(@PathVariable Long id) {
-        return playerProfileService.getPlayerProfileById(id);
+    public PlayerProfileDTO getPlayerProfile(@PathVariable Long id) {
+        PlayerProfile profile = playerProfileService.getPlayerProfileById(id);
+        return new PlayerProfileDTO(profile);
     }
 
     @Operation(summary = "Update player stats", description = "Updates player stats with the provided details")

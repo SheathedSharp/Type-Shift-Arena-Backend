@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-14 17:01:00
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-14 22:39:12
+ * @LastEditTime: 2024-11-15 09:58:15
  */
 package com.example.demo.model.game;
 
@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 public class MatchRequest {
     private String playerId;
     private String playerName;
+    private String playerAvatar;
     private TextLanguage language;
     private TextCategory category;
     private String difficulty;

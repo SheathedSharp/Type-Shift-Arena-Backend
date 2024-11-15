@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-14 07:59:08
+ * @LastEditTime: 2024-11-15 19:14:22
  */
 package com.example.demo.service.game;
 
@@ -10,8 +10,10 @@ import com.example.demo.model.game.GameRoom;
 import com.example.demo.model.game.GameStatus;
 import com.example.demo.entity.enums.TextLanguage;
 import com.example.demo.entity.enums.TextCategory;
+import com.example.demo.model.game.GameMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +26,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameRoomService {
     private final Map<String, GameRoom> rooms = new ConcurrentHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameRoomService.class);
+    private final SimpMessagingTemplate messagingTemplate;
+    private final GameTextService gameTextService;
     private static final int MAX_PLAYERS = 2;
 
     @Autowired
-    private GameTextService gameTextService;
+    public GameRoomService(SimpMessagingTemplate messagingTemplate, GameTextService gameTextService) {
+        this.messagingTemplate = messagingTemplate;
+        this.gameTextService = gameTextService;
+    }
 
     // public GameRoom createRoom(String roomId) {
     //     GameRoom room = new GameRoom(roomId);
@@ -38,9 +45,19 @@ public class GameRoomService {
     // }
     public GameRoom createRoom(String roomId, TextLanguage language, TextCategory category, String difficulty) {
         GameRoom room = new GameRoom(roomId);
+        
+        // 设置房间的语言、类型和难度属性
+        room.setLanguage(language);
+        room.setCategory(category);
+        room.setDifficulty(difficulty);
+        
+        // 获取并设置目标文本
         String targetText = gameTextService.getRandomText(language, category, difficulty);
         room.setTargetText(targetText);
+        
+        // 存储房间
         rooms.put(roomId, room);
+        
         return room;
     }
 
@@ -146,5 +163,47 @@ public class GameRoomService {
 
     public boolean hasPlayer(GameRoom room, String playerId) {
         return room.getPlayersId().contains(playerId);
+    }
+
+    public GameMessage getRoomInfo(String roomId, String requestPlayerId, String requestPlayerName) {
+        GameRoom room = getRoom(roomId);
+        if (room == null) {
+            return null;
+        }
+
+        // 找出对手信息
+        String opponentId = room.getPlayersId().stream()
+            .filter(id -> !id.equals(requestPlayerId))
+            .findFirst()
+            .orElse(null);
+            
+        String opponentName = opponentId != null ? 
+            room.getPlayersName().stream()
+                .filter(name -> !name.equals(requestPlayerName))
+                .findFirst()
+                .orElse(null) : null;
+
+        // 构建房间信息消息
+        GameMessage roomInfo = new GameMessage();
+        roomInfo.setType("GAME_INFO");
+        roomInfo.setRoomId(roomId);
+        roomInfo.setPlayerId(requestPlayerId);
+        roomInfo.setPlayerName(requestPlayerName);
+        roomInfo.setPlayerAvatar("https://api.dicebear.com/7.x/avataaars/svg?seed=" + requestPlayerName);
+        roomInfo.setOpponentId(opponentId);
+        roomInfo.setOpponentName(opponentName);
+        roomInfo.setOpponentAvatar(opponentId != null ? 
+            "https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName : null);
+        roomInfo.setLanguage(room.getLanguage().toString());
+        roomInfo.setCategory(room.getCategory().toString());
+        roomInfo.setDifficulty(room.getDifficulty());
+        roomInfo.setRoomStatus(room.getStatus().toString());
+        roomInfo.setPlayersCount(room.getPlayersId().size());
+        roomInfo.setTargetText(room.getTargetText());
+        roomInfo.setStartTime(room.getStartTime());
+        roomInfo.setTimestamp(System.currentTimeMillis());
+        roomInfo.setIsHost(room.getHostId().equals(requestPlayerId));
+
+        return roomInfo;
     }
 }

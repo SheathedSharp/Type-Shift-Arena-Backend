@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-14 17:00:29
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-14 22:53:40
+ * @LastEditTime: 2024-11-15 19:31:21
  */
 package com.example.demo.service.game;
 
@@ -11,6 +11,7 @@ import com.example.demo.entity.enums.TextCategory;
 import com.example.demo.model.game.GameMessage;
 import com.example.demo.model.game.MatchRequest;
 import com.example.demo.model.game.GameRoom;
+import com.example.demo.model.game.GameStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,6 +22,8 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Service
 public class MatchmakingService {
@@ -84,25 +87,53 @@ public class MatchmakingService {
 
     private void createMatchedRoom(MatchRequest player1, MatchRequest player2) {
         String roomId = UUID.randomUUID().toString();
+        
+        // 创建房间并添加两个玩家
         GameRoom room = gameRoomService.createRoom(
             roomId,
             player1.getLanguage(),
             player1.getCategory(),
             player1.getDifficulty()
         );
-
-        // 通知两个玩家已匹配成功，并告知房间信息
-        notifyMatchFound(player1, roomId);
-        notifyMatchFound(player2, roomId);
+        
+        // 设置player1为房主
+        room.setHostId(player1.getPlayerId());
+        
+        // 添加两个玩家到房间
+        gameRoomService.addPlayer(room, player1.getPlayerId(), player1.getPlayerName());
+        gameRoomService.addPlayer(room, player2.getPlayerId(), player2.getPlayerName());
+        
+        // 设置房间状态为准备就绪
+        // gameRoomService.setGameStatus(room, GameStatus.READY);
+        
+        // 通知两个玩家已匹配成功，并发送房间和对手信息
+        notifyMatchFound(player1, player2, roomId, room, true);  // player1是房主
+        notifyMatchFound(player2, player1, roomId, room, false); // player2不是房主
     }
 
-    private void notifyMatchFound(MatchRequest player, String roomId) {
+    private void notifyMatchFound(MatchRequest player, MatchRequest opponent, 
+                                String roomId, GameRoom room, boolean isHost) {
         messagingTemplate.convertAndSend(
             "/queue/matchmaking/" + player.getPlayerId(),
             new GameMessage() {{
                 setType("MATCH_FOUND");
                 setRoomId(roomId);
+                setPlayerId(player.getPlayerId());
+                setPlayerName(player.getPlayerName());
+                setPlayerAvatar(player.getPlayerAvatar());
+                setOpponentId(opponent.getPlayerId());
+                setOpponentName(opponent.getPlayerName());
+                setOpponentAvatar(opponent.getPlayerAvatar());
+                setTargetText(room.getTargetText());
+                setLanguage(room.getLanguage().toString());
+                setCategory(room.getCategory().toString());
+                setDifficulty(room.getDifficulty());
+                setMessage(String.format("找到对手: %s", opponent.getPlayerName()));
+                setRoomStatus(GameStatus.WAITING.toString());
+                setPlayersCount(room.getPlayersId().size());
+                setStartTime(room.getStartTime());
                 setTimestamp(System.currentTimeMillis());
+                setIsHost(isHost);  // 添加是否为房主的标识
             }}
         );
     }

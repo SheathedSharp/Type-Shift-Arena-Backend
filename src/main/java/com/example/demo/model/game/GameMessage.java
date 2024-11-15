@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-06 18:19:04
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-14 22:56:17
+ * @LastEditTime: 2024-11-15 16:22:51
  */
 package com.example.demo.model.game;
 
@@ -13,6 +13,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.Set;
+
 
 @Getter
 @Setter
@@ -22,8 +24,15 @@ public class GameMessage {
     private String type;
     private String playerId;
     private String playerName;
+    private String playerAvatar;
+    private String opponentId;
+    private String opponentName;
+    private String opponentAvatar;
+    private Set<String> playersId;
+    private Set<String> playersName;
     private Double percentage;
     private String message;
+    private Boolean isHost;  // 添加是否为房主的标识
     private String roomId;     // 添加房间ID属性        
     private String roomStatus;    // 房间状态
     private String targetText;    // 目标文本

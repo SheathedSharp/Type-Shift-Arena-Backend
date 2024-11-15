@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-14 11:07:23
+ * @LastEditTime: 2024-11-15 16:50:43
  */
 package com.example.demo.controller.game;
 
@@ -83,6 +83,7 @@ public class GameRoomController {
                 setCategory(category.toString());
                 setDifficulty(difficulty);
                 setTargetText(room.getTargetText()); // 添加目标文本
+                setStartTime(room.getStartTime());
                 setTimestamp(System.currentTimeMillis());
             }}
         );
@@ -123,13 +124,20 @@ public class GameRoomController {
     @MessageMapping("/room/{roomId}/start")
     public void startGame(@DestinationVariable String roomId, GameMessage message) {
         logger.info("Starting game in room {}", roomId);
-
+        
         GameRoom room = gameRoomService.getRoom(roomId);
-
-        if (room != null && gameRoomService.isPlayerHost(room, message.getPlayerId())) {
-            room.setStatus(GameStatus.PLAYING);
+        if (room != null) {
+            // 验证是否为房主发起的请求
+            if (!room.getHostId().equals(message.getPlayerId())) {
+                logger.warn("Non-host player {} attempted to start game in room {}", 
+                    message.getPlayerId(), roomId);
+                return;
+            }
             
-            // 广播游戏开始
+            // 设置游戏状态为进行中
+            gameRoomService.setGameStatus(room, GameStatus.PLAYING);
+            
+            // 广播游戏开始消息
             messagingTemplate.convertAndSend(
                 "/topic/room/" + roomId,
                 new GameMessage() {{
@@ -178,6 +186,27 @@ public class GameRoomController {
             );
         }
     }
+
+    @MessageMapping("/room/{roomId}/info")
+    public void getRoomInfo(@DestinationVariable String roomId, GameMessage message) {
+        logger.info("Getting room info for room {}, requested by player {}", 
+            roomId, message.getPlayerId());
+        
+        GameMessage roomInfo = gameRoomService.getRoomInfo(
+            roomId, 
+            message.getPlayerId(), 
+            message.getPlayerName()
+        );
+        
+        if (roomInfo != null) {
+            // 发送房间信息给请求的玩家
+            messagingTemplate.convertAndSend(
+                "/queue/room/" + message.getPlayerId() + "/info",
+                roomInfo
+            );
+        }
+    }
+
 
     @Operation(summary = "Get the status of a game room", description = "Returns the status of the game room with the provided ID")
     @GetMapping("/api/rooms/{roomId}/status")

@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:23
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-15 19:14:22
+ * @LastEditTime: 2024-11-15 21:40:12
  */
 package com.example.demo.service.game;
 
@@ -205,5 +205,36 @@ public class GameRoomService {
         roomInfo.setIsHost(room.getHostId().equals(requestPlayerId));
 
         return roomInfo;
+    }
+
+    public void playerReady(String roomId, String playerId, String playerName, Boolean isReady) {
+        GameRoom room = getRoom(roomId);
+        if (room != null) {
+            // 根据isReady参数设置房间状态
+            GameStatus newStatus = isReady ? GameStatus.READY : GameStatus.WAITING;
+            setGameStatus(room, newStatus);
+            
+            // 找到另一个玩家的ID
+            String otherPlayerId = room.getPlayersId().stream()
+                .filter(id -> !id.equals(playerId))
+                .findFirst()
+                .orElse(null);
+            
+            if (otherPlayerId != null) {
+                // 通知另一个玩家
+                messagingTemplate.convertAndSend(
+                    "/queue/room/" + otherPlayerId + "/info",
+                    new GameMessage() {{
+                        setType("PLAYER_READY");
+                        setPlayerId(playerId);          // 准备的玩家ID
+                        setPlayerName(playerName);      // 准备的玩家名称
+                        setRoomId(roomId);
+                        setIsReady(isReady);  // 设置准备状态
+                        setRoomStatus(newStatus.toString());
+                        setTimestamp(System.currentTimeMillis());
+                    }}
+                );
+            }
+        }
     }
 }

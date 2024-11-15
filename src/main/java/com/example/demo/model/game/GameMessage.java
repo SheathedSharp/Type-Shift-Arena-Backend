@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-06 18:19:04
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-15 16:22:51
+ * @LastEditTime: 2024-11-15 21:39:22
  */
 package com.example.demo.model.game;
 
@@ -41,6 +41,7 @@ public class GameMessage {
     private String language;    // 对应 TextLanguage
     private String category;    // 对应 TextCategory 
     private String difficulty; // 难度级别
+    private Boolean isReady;  // 准备状态字段
     @JsonDeserialize(using = CustomTimestampDeserializer.class) // 使用自定义的时间戳反序列化器将时间戳转换为Long类型
     private Long timestamp;
 }

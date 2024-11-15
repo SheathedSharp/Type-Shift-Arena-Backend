@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-15 16:50:43
+ * @LastEditTime: 2024-11-15 21:39:33
  */
 package com.example.demo.controller.game;
 
@@ -205,6 +205,22 @@ public class GameRoomController {
                 roomInfo
             );
         }
+    }
+
+    @MessageMapping("/room/{roomId}/ready")
+    public void playerReady(@DestinationVariable String roomId, GameMessage message) {
+        logger.info("Player {} ready status changed to {} in room {}", 
+            message.getPlayerId(), 
+            message.getIsReady(), 
+            roomId
+        );
+        
+        gameRoomService.playerReady(
+            roomId,
+            message.getPlayerId(),
+            message.getPlayerName(),
+            message.getIsReady()  // 传递准备状态
+        );
     }
 
 

@@ -7,6 +7,7 @@
 package com.example.demo.entity;
 
 import com.example.demo.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class PlayerProfile {
     @OneToOne
     @MapsId
     @JoinColumn(name = "user_id")
+    @JsonIgnore // 避免返回User对象时出现循环引用
     private User user;
 
     @Column(name = "userLevel") 

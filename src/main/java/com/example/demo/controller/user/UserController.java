@@ -7,14 +7,16 @@
 package com.example.demo.controller.user;
 
 import com.example.demo.entity.User;
+import com.example.demo.model.dto.UpdatePasswordDTO;
+import com.example.demo.model.dto.UpdateUserDTO;
+import com.example.demo.model.dto.UserCreateDTO;
 import com.example.demo.model.dto.UserDTO;
 import com.example.demo.service.user.UserService;
 import com.example.demo.core.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,31 +43,49 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Create a new user", description = "Creates a new user with the provided details")
+    @Operation(summary = "Create a user", description = "Creates a new user with the provided details")
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
-        if (userService.existsByUsername(user.getUsername())) {
+
+    public ResponseEntity<?> createUser(@RequestBody UserCreateDTO userCreateDTO) {
+        // 验证用户名是否已存在
+        if (userService.existsByUsername(userCreateDTO.getUsername())) {
             return ResponseEntity.badRequest().body("Username already exists");
         }
-        if (userService.existsByEmail(user.getEmail())) {
+
+        // 验证邮箱是否已存在
+        if (userService.existsByEmail(userCreateDTO.getEmail())) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
-        User savedUser = userService.saveUser(user);
-        return ResponseEntity.ok(savedUser);
+
+        // 创建新用户
+        User newUser = new User();
+        newUser.setUsername(userCreateDTO.getUsername());
+        newUser.setPassword(userCreateDTO.getPassword());
+        newUser.setEmail(userCreateDTO.getEmail());
+
+        // 调用服务层方法保存用户
+        userService.saveUser(newUser);
+
+        // 返回创建成功的响应
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
-    @Operation(summary = "Update a user", description = "Updates a user with the provided details")
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.getUserById(id)
-                .map(existingUser -> {
-                    existingUser.setUsername(user.getUsername());
-                    existingUser.setEmail(user.getEmail());
-                    // Don't update password here, create a separate endpoint for password changes
-                    return ResponseEntity.ok(userService.saveUser(existingUser));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO) {
+        User updatedUser = userService.updateUserById(id, updateUserDTO);
+
+        return ResponseEntity.ok(updatedUser);
     }
+
+    @Operation(summary = "Update a user's password", description = "Updates a user's password ")
+    @PutMapping("/{id}/password")
+    public ResponseEntity<String> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordDTO updatePasswordDTO)
+    {
+        // 调用服务层方法，尝试更新密码
+        userService.updatePassword(id, updatePasswordDTO);
+        return ResponseEntity.ok("Password updated successfully");
+    }
+
 
     @Operation(summary = "Delete a user", description = "Deletes a user by ID")
     @DeleteMapping("/{id}")
@@ -78,7 +98,7 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    
+
     @GetMapping("/username/{username}")
     @Operation(summary = "Get user by username", description = "Returns a user as per the username")
     public ResponseEntity<ApiResponse<UserDTO>> getUserByUsername(

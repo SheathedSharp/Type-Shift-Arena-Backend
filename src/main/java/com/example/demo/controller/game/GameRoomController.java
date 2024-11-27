@@ -9,6 +9,7 @@ package com.example.demo.controller.game;
 import com.example.demo.model.game.GameRoom;
 import com.example.demo.model.game.GameStatus;
 import com.example.demo.model.game.GameMessage;
+import com.example.demo.model.game.GameProgress;
 import com.example.demo.service.game.GameRoomService;
 import com.example.demo.entity.enums.TextLanguage;
 import com.example.demo.entity.enums.TextCategory;
@@ -152,19 +153,18 @@ public class GameRoomController {
     }
 
     @MessageMapping("/room/{roomId}/progress")
-    public void updateProgress(@DestinationVariable String roomId, GameMessage message) {
-        logger.debug("Progress update in room {}: Player {} at {}%", 
-            roomId, message.getPlayerId(), message.getPercentage());
+    public void updateProgress(@DestinationVariable String roomId, GameProgress progress) {
+        logger.debug("Progress update in room {}: Player {} at {}%, WPM: {}, Accuracy: {}%", 
+            roomId, progress.getPlayerId(), progress.getPercentage(), 
+            progress.getStats().getWpm(), progress.getStats().getAccuracy());
         
-        // Broadcast progress update
+        // 确保消息类型为PLAYER_PROGRESS
+        progress.setType("PLAYER_PROGRESS");
+        
+        // 广播进度更新
         messagingTemplate.convertAndSend(
             "/topic/room/" + roomId,
-            new GameMessage() {{
-                setType("PLAYER_PROGRESS");
-                setPlayerId(message.getPlayerId());
-                setPercentage(message.getPercentage());
-                setTimestamp(message.getTimestamp());
-            }}
+            progress
         );
     }
 

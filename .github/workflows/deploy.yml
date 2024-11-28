@@ -37,11 +37,19 @@ jobs:
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "echo 'SSH connection successful'"
         
         echo "Stopping existing application..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ps aux | grep 'java -jar' || true"
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "pkill -f 'java -jar' || true"
+        
+        echo "Verifying backend directory exists..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ls -la $BACKEND_PATH"
         
         echo "Copying new jar file..."
         NEW_JAR_NAME=$(ls target/*.jar | xargs basename)
-        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no target/*.jar $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/$NEW_JAR_NAME
+        echo "New JAR file name: $NEW_JAR_NAME"
+        sshpass -p "$SSH_PASSWORD" scp -v -o StrictHostKeyChecking=no target/*.jar $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/$NEW_JAR_NAME
+        
+        echo "Verifying file copy..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ls -la $BACKEND_PATH"
         
         echo "Starting application..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "cd $BACKEND_PATH && java -jar $NEW_JAR_NAME --spring.profiles.active=prod > app.log 2>&1 &"

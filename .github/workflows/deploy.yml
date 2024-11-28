@@ -82,7 +82,7 @@ jobs:
             /bin/cp TSA.service /etc/systemd/system/ &&
             /usr/bin/systemctl daemon-reload &&
             /usr/bin/systemctl restart TSA &&
-            /usr/bin/systemctl enable TSA &&
+            /usr/bin/systemctl enable TSA
         "
                 
         # 验证应用启动

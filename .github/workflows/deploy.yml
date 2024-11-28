@@ -65,7 +65,7 @@ jobs:
         # 停止现有应用
         echo "Stopping existing application..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ps aux | grep 'java -jar'"
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "pkill -f 'java -jar' || true"
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "kill \$(pgrep -f 'java -jar') 2>/dev/null || true"
         
         # 检查本地 JAR 文件
         echo "Checking local JAR file..."

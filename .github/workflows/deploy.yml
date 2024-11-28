@@ -1,0 +1,47 @@
+name: Deploy Backend to Server
+
+on:
+  push:
+    branches:
+      - main
+      - feature/deploy-ci
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: Deploy
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn clean package
+
+    - name: Deploy to server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
+        SUDO_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+      run: |
+        echo "Testing SSH connection..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "echo 'SSH connection successful'"
+        
+        echo "Stopping existing application..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "pkill -f 'java -jar' || true"
+        
+        echo "Copying new jar file..."
+        NEW_JAR_NAME=$(ls target/*.jar | xargs basename)
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no target/*.jar $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/$NEW_JAR_NAME
+        
+        echo "Starting application..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "cd $BACKEND_PATH && java -jar $NEW_JAR_NAME --spring.profiles.active=prod > app.log 2>&1 &"

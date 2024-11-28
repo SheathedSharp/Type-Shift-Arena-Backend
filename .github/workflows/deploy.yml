@@ -79,14 +79,10 @@ jobs:
         echo "Starting application on server..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
           cd $BACKEND_PATH &&
-            # Copy service file if not exists
-            sudo cp TSA.service /etc/systemd/system/ &&
-            # Reload systemd
-            sudo systemctl daemon-reload &&
-            # Restart service
-            sudo systemctl restart TSA &&
-            # Enable service on boot
-            sudo systemctl enable TSA
+            /bin/cp TSA.service /etc/systemd/system/ &&
+            /usr/bin/systemctl daemon-reload &&
+            /usr/bin/systemctl restart TSA &&
+            /usr/bin/systemctl enable TSA &&
         "
                 
         # 验证应用启动

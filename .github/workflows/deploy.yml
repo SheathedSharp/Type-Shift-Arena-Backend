@@ -79,7 +79,8 @@ jobs:
         echo "Starting application on server..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
           cd $BACKEND_PATH &&
-          nohup java -jar $JAR_BASENAME --spring.profiles.active=prod > app.log 2>&1 &
+          echo 'Starting application with environment variables...' &&
+          nohup bash -c 'source ~/.bashrc && java -jar $JAR_BASENAME --spring.profiles.active=prod' > app.log 2>&1 &
         "
         
         # 验证应用启动

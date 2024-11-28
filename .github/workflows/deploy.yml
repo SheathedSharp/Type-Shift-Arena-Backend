@@ -79,9 +79,10 @@ jobs:
         echo "Starting application on server..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
           cd $BACKEND_PATH &&
-            sudo /usr/bin/systemctl daemon-reload &&
-            sudo /usr/bin/systemctl restart TSA &&
-            sudo /usr/bin/systemctl enable TSA
+          SYSTEMCTL='/usr/bin/systemctl --system --no-ask-password' &&
+          \$SYSTEMCTL daemon-reload &&
+          \$SYSTEMCTL restart TSA &&
+          \$SYSTEMCTL enable TSA
         "
                 
         # 验证应用启动

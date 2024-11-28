@@ -22,16 +22,14 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-m2-
 
     - name: Build with Maven
-      run: mvn -B clean package -DskipTests
+      run: |
+        echo "Starting Maven build..."
+        mvn clean package
+        echo "Maven build completed"
+        echo "Checking target directory:"
+        ls -l target/
 
     - name: Deploy to server
       env:
@@ -41,6 +39,11 @@ jobs:
         BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
         SUDO_PASSWORD: ${{ secrets.SSH_PASSWORD }}
       run: |
+        # 确认工作目录和文件
+        echo "Current directory: $PWD"
+        echo "Checking for JAR file:"
+        ls -l target/*.jar || echo "No JAR files found in target directory"
+        
         # 测试基本连接
         echo "Testing SSH connection..."
         if ! sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "echo 'SSH connection successful'"; then

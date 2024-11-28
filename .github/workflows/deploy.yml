@@ -55,16 +55,25 @@ jobs:
           exit 1
         fi
         
+        # 检查目录权限
+        echo "Checking directory permissions..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ls -la $BACKEND_PATH"
+        
         # 停止现有应用
         echo "Stopping existing application..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ps aux | grep 'java -jar'"
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "pkill -f 'java -jar' || true"
         
+        # 检查本地 JAR 文件
+        echo "Checking local JAR file..."
+        ls -l target/*.jar
+        
         # 复制新的jar文件
         echo "Copying new jar file..."
         NEW_JAR_NAME=$(ls target/*.jar | xargs basename)
         echo "New JAR file name: $NEW_JAR_NAME"
-        if ! sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no target/*.jar $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/$NEW_JAR_NAME; then
+        echo "Attempting to copy file to: $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/$NEW_JAR_NAME"
+        if ! sshpass -p "$SSH_PASSWORD" scp -v -o StrictHostKeyChecking=no target/*.jar $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/$NEW_JAR_NAME; then
           echo "Failed to copy JAR file"
           exit 1
         fi
@@ -82,5 +91,10 @@ jobs:
           echo "Failed to start application"
           exit 1
         fi
+        
+        # 验证应用启动
+        echo "Verifying application startup..."
+        sleep 5
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "ps aux | grep 'java -jar'"
         
         echo "Deployment completed successfully"

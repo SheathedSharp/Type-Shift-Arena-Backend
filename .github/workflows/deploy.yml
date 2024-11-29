@@ -79,15 +79,18 @@ jobs:
         echo "Starting application on server..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
           cd $BACKEND_PATH &&
-          export XDG_RUNTIME_DIR=/run/user/\$(id -u) &&
-          /usr/bin/systemctl --user daemon-reload &&
-          /usr/bin/systemctl --user restart TSA &&
-          /usr/bin/systemctl --user enable TSA
+          systemctl --user daemon-reload &&
+          systemctl --user --user restart TSA &&
+          systemctl --user --user enable TSA
         "
                 
         # 验证应用启动
         echo "Verifying application startup..."
         sleep 5
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "systemctl is-active TSA && echo 'Application is running' || echo 'Failed to start application'"
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
+          if systemctl is-active --user TSA.service > /dev/null; then
+            echo "Application is running"
+          else
+            echo "Failed to start application"
 
         echo "Deployment completed successfully!"

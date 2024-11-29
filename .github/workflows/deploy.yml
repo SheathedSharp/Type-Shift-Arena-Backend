@@ -89,8 +89,10 @@ jobs:
         sleep 5
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
           if systemctl is-active --user TSA.service > /dev/null; then
-            echo "Application is running"
+            echo 'Application is running'
           else
-            echo "Failed to start application"
+            echo 'Failed to start application'
+          fi
+        "
 
         echo "Deployment completed successfully!"

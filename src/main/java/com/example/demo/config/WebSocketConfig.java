@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -23,19 +24,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     
     private static final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
+    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+    private String allowedOrigins;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-            .setAllowedOrigins("http://localhost:5173")
+            .setAllowedOrigins(allowedOrigins.split(","))
             .withSockJS()
             .setWebSocketEnabled(true)
             .setDisconnectDelay(30 * 1000);
             
         // 同时添加一个不使用 SockJS 的端点，用于直接的 WebSocket 连接
         registry.addEndpoint("/ws")
-            .setAllowedOrigins("http://localhost:5173");
+            .setAllowedOrigins(allowedOrigins.split(","));
             
-        logger.info("WebSocket endpoint registered with SockJS support");
+        logger.info("WebSocket endpoint registered with allowed origins: {}", allowedOrigins);
     }
 
     @Override

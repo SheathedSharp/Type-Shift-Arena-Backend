@@ -1,0 +1,97 @@
+name: Deploy Backend to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: Deploy
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: |
+        echo "Starting Maven build..."
+        mvn clean package -DskipTests
+        echo "Maven build completed"
+        echo "Checking target directory:"
+        ls -l target/
+
+    - name: Deploy to server
+      env:
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        SERVER_USER: ${{ secrets.SERVER_USER }}
+        SERVER_HOST: ${{ secrets.SERVER_HOST }}
+        BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
+        SUDO_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+      run: |
+        set -e
+        
+        # 确认 JAR 文件是否生成
+        echo "Checking for JAR file in target directory..."
+        JAR_FILE=$(ls target/*.jar | head -n 1)
+        if [ -z "$JAR_FILE" ]; then
+          echo "Error: No JAR file found in target directory!"
+          exit 1
+        fi
+        echo "JAR file found: $JAR_FILE"
+
+        # 测试 SSH 连接
+        echo "Testing SSH connection..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "echo 'SSH connection successful'"
+
+        # 检查远程目录是否存在
+        echo "Checking backend directory on server..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "[ -d $BACKEND_PATH ] || mkdir -p $BACKEND_PATH"
+
+        # 停止现有应用
+        echo "Stopping existing application in the specified directory..."
+        TARGET_DIR=$BACKEND_PATH
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
+          APP_PID=\$(ps aux | grep 'java -jar' | grep \"\$TARGET_DIR/\" | grep -v 'grep' | awk '{print \$2}')
+          if [ -n \"\$APP_PID\" ]; then
+            echo \"Found application running with PID: \$APP_PID\"
+            kill -9 \$APP_PID
+          else
+            echo \"No application running in directory \$TARGET_DIR\"
+          fi
+        "
+
+        # 上传新的 JAR 文件
+        echo "Copying JAR file to server..."
+        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no $JAR_FILE $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/
+
+        # 启动新应用
+        JAR_BASENAME=$(basename $JAR_FILE)
+        echo "Starting application on server..."
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
+          cd $BACKEND_PATH &&
+          systemctl --user daemon-reload &&
+          systemctl --user --user restart TSA &&
+          systemctl --user --user enable TSA
+        "
+                
+        # 验证应用启动
+        echo "Verifying application startup..."
+        sleep 5
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
+          if systemctl is-active --user TSA.service > /dev/null; then
+            echo 'Application is running'
+          else
+            echo 'Failed to start application'
+          fi
+        "
+
+        echo "Deployment completed successfully!"

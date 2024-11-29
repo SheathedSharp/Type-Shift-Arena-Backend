@@ -8,6 +8,6 @@ import lombok.Setter;
 public class UpdateUserDTO {
     private String username;
     private String email;
-
+    private String imgSrc;
 }
 

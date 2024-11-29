@@ -75,13 +75,14 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    // 更新用户基础信息（用户名、邮箱）
+    // 更新用户基础信息（用户名、邮箱、头像url）
     public User updateUserById(Long id, UpdateUserDTO updateUserDTO) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             user.setUsername(updateUserDTO.getUsername());
             user.setEmail(updateUserDTO.getEmail());
+            user.setImgSrc(updateUserDTO.getImgSrc());
             return userRepository.save(user);
         } else {
             throw new ResourceNotFoundException("User not found with id " + id);

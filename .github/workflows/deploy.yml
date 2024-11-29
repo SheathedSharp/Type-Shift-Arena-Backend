@@ -79,10 +79,9 @@ jobs:
         echo "Starting application on server..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
           cd $BACKEND_PATH &&
-          SYSTEMCTL='/usr/bin/systemctl --system --no-ask-password' &&
-          \$SYSTEMCTL daemon-reload &&
-          \$SYSTEMCTL restart TSA &&
-          \$SYSTEMCTL enable TSA
+          XDG_RUNTIME_DIR=/run/user/\$(id -u) /usr/bin/systemctl --user daemon-reload &&
+          XDG_RUNTIME_DIR=/run/user/\$(id -u) /usr/bin/systemctl --user restart TSA &&
+          XDG_RUNTIME_DIR=/run/user/\$(id -u) /usr/bin/systemctl --user enable TSA
         "
                 
         # 验证应用启动

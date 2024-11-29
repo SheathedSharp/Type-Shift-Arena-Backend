@@ -79,8 +79,6 @@ jobs:
         echo "Starting application on server..."
         sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "
           cd $BACKEND_PATH &&
-          mkdir -p /home/typeshift/.config/systemd/user &&
-          cp TSA.service /home/typeshift/.config/systemd/user/ &&
           export XDG_RUNTIME_DIR=/run/user/\$(id -u) &&
           /usr/bin/systemctl --user daemon-reload &&
           /usr/bin/systemctl --user restart TSA &&

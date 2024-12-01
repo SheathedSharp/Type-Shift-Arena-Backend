@@ -22,27 +22,25 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.example.demo.service.user.UserService;
+import com.example.demo.entity.User;
+
 @Service
 public class GameRoomService {
     private final Map<String, GameRoom> rooms = new ConcurrentHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameRoomService.class);
     private final SimpMessagingTemplate messagingTemplate;
     private final GameTextService gameTextService;
+    private final UserService userService;
     private static final int MAX_PLAYERS = 2;
 
     @Autowired
-    public GameRoomService(SimpMessagingTemplate messagingTemplate, GameTextService gameTextService) {
+    public GameRoomService(SimpMessagingTemplate messagingTemplate, GameTextService gameTextService, UserService userService) {
         this.messagingTemplate = messagingTemplate;
         this.gameTextService = gameTextService;
+        this.userService = userService;
     }
 
-    // public GameRoom createRoom(String roomId) {
-    //     GameRoom room = new GameRoom(roomId);
-    //     String targetText = gameTextService.getRandomText(difficulty, category);
-    //     room.setTargetText(targetText);
-    //     rooms.put(roomId, room);
-    //     return room;
-    // }
     public GameRoom createRoom(String roomId, TextLanguage language, TextCategory category, String difficulty) {
         GameRoom room = new GameRoom(roomId);
         
@@ -189,11 +187,24 @@ public class GameRoomService {
         roomInfo.setRoomId(roomId);
         roomInfo.setPlayerId(requestPlayerId);
         roomInfo.setPlayerName(requestPlayerName);
-        roomInfo.setPlayerAvatar("https://api.dicebear.com/7.x/avataaars/svg?seed=" + requestPlayerName);
+        
+        // 获取请求玩家的头像
+        String playerAvatar = userService.getUserById(Long.parseLong(requestPlayerId))
+                .map(User::getImgSrc)
+                .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + requestPlayerName);
+        roomInfo.setPlayerAvatar(playerAvatar);
+        
         roomInfo.setOpponentId(opponentId);
         roomInfo.setOpponentName(opponentName);
-        roomInfo.setOpponentAvatar(opponentId != null ? 
-            "https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName : null);
+        
+        // 获取对手的头像
+        String opponentAvatar = opponentId != null ? 
+            userService.getUserById(Long.parseLong(opponentId))
+                    .map(User::getImgSrc)
+                    .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName) 
+            : null;
+        roomInfo.setOpponentAvatar(opponentAvatar);
+        
         roomInfo.setLanguage(room.getLanguage().toString());
         roomInfo.setCategory(room.getCategory().toString());
         roomInfo.setDifficulty(room.getDifficulty());

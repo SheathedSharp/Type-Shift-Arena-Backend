@@ -22,8 +22,6 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Service
 public class MatchmakingService {
@@ -77,15 +75,15 @@ public class MatchmakingService {
         }
     }
 
-    private String generateQueueKey(TextLanguage language, TextCategory category, String difficulty) {
+    public String generateQueueKey(TextLanguage language, TextCategory category, String difficulty) {
         return language + "_" + category + "_" + difficulty;
     }
 
-    private MatchRequest findMatch(Queue<MatchRequest> queue, MatchRequest newRequest) {
+    public MatchRequest findMatch(Queue<MatchRequest> queue, MatchRequest newRequest) {
         return queue.poll();
     }
 
-    private void createMatchedRoom(MatchRequest player1, MatchRequest player2) {
+    public void createMatchedRoom(MatchRequest player1, MatchRequest player2) {
         String roomId = UUID.randomUUID().toString();
         
         // 创建房间并添加两个玩家
@@ -137,4 +135,8 @@ public class MatchmakingService {
             }}
         );
     }
-} 
+
+    public Map<String, Queue<MatchRequest>> getMatchmakingQueues() {
+        return new ConcurrentHashMap<>(matchmakingQueues);
+    }
+}

@@ -53,6 +53,21 @@ public class User {
     @JsonIgnoreProperties("friends") // 忽略 friends 属性，避免循环引用
     private Set<User> friends = new HashSet<>();
 
+    public User() {}
+
+    public User(Long id, String username, String password, String email, String imgSrc) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.imgSrc = imgSrc;
+    }
+
+    public User setUsername(String username) {
+        this.username = username;
+        return this; // Return the current instance
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

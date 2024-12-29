@@ -34,4 +34,12 @@ public class GameRoom {
     public GameRoom(String id) {
         this.id = id;
     }
+
+    public String getRoomId() {
+        return id;
+    }
+
+    public void setRoomId(String id) {
+        this.id = id;
+    }
 }

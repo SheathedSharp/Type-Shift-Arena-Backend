@@ -27,7 +27,7 @@ import com.example.demo.entity.User;
 
 @Service
 public class GameRoomService {
-    private final Map<String, GameRoom> rooms = new ConcurrentHashMap<>();
+    protected Map<String, GameRoom> rooms = new ConcurrentHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameRoomService.class);
     private final SimpMessagingTemplate messagingTemplate;
     private final GameTextService gameTextService;
@@ -43,29 +43,29 @@ public class GameRoomService {
 
     public GameRoom createRoom(String roomId, TextLanguage language, TextCategory category, String difficulty) {
         GameRoom room = new GameRoom(roomId);
-        
+
         // 设置房间的语言、类型和难度属性
         room.setLanguage(language);
         room.setCategory(category);
         room.setDifficulty(difficulty);
-        
+
         // 获取并设置目标文本
         String targetText = gameTextService.getRandomText(language, category, difficulty);
         room.setTargetText(targetText);
-        
+
         // 存储房间
         rooms.put(roomId, room);
-        
+
         return room;
     }
 
     // 添加一个使用默认参数的重载方法
     public GameRoom createRoom(String roomId) {
         return createRoom(
-            roomId,
-            TextLanguage.ENGLISH,  // 默认使用英语
-            TextCategory.DAILY_CHAT,  // 默认使用日常对话
-            "EASY"  // 默认使用简单难度
+                roomId,
+                TextLanguage.ENGLISH,  // 默认使用英语
+                TextCategory.DAILY_CHAT,  // 默认使用日常对话
+                "EASY"  // 默认使用简单难度
         );
     }
 
@@ -73,32 +73,32 @@ public class GameRoomService {
         return rooms.get(roomId);
     }
 
-    public GameRoom joinRoom(String roomId, String playerId, String playerName, 
-                            TextLanguage language, TextCategory category, String difficulty) {
+    public GameRoom joinRoom(String roomId, String playerId, String playerName,
+                             TextLanguage language, TextCategory category, String difficulty) {
         GameRoom room = rooms.get(roomId);
         if (room == null) {
             // 使用传入的参数创建房间
             room = createRoom(roomId, language, category, difficulty);
         }
-        
+
         if (addPlayer(room, playerId, playerName)) {
             if (isRoomFull(room)) {
                 setGameStatus(room, GameStatus.READY);
             }
         }
-        
+
         return room;
     }
 
     // 添加一个使用默认参数的重载方法
     public GameRoom joinRoom(String roomId, String playerId, String playerName) {
         return joinRoom(
-            roomId,
-            playerId,
-            playerName,
-            TextLanguage.ENGLISH,  // 默认使用英语
-            TextCategory.DAILY_CHAT,  // 默认使用日常对话
-            "EASY"  // 默认使用简单难度
+                roomId,
+                playerId,
+                playerName,
+                TextLanguage.ENGLISH,  // 默认使用英语
+                TextCategory.DAILY_CHAT,  // 默认使用日常对话
+                "EASY"  // 默认使用简单难度
         );
     }
 
@@ -155,8 +155,8 @@ public class GameRoomService {
     }
 
     public boolean isPlayerHost(GameRoom room, String playerId) {
-        return !room.getPlayersId().isEmpty() && 
-               room.getPlayersId().iterator().next().equals(playerId);
+        return !room.getPlayersId().isEmpty() &&
+                room.getPlayersId().iterator().next().equals(playerId);
     }
 
     public boolean hasPlayer(GameRoom room, String playerId) {
@@ -171,15 +171,15 @@ public class GameRoomService {
 
         // 找出对手信息
         String opponentId = room.getPlayersId().stream()
-            .filter(id -> !id.equals(requestPlayerId))
-            .findFirst()
-            .orElse(null);
-            
-        String opponentName = opponentId != null ? 
-            room.getPlayersName().stream()
-                .filter(name -> !name.equals(requestPlayerName))
+                .filter(id -> !id.equals(requestPlayerId))
                 .findFirst()
-                .orElse(null) : null;
+                .orElse(null);
+
+        String opponentName = opponentId != null ?
+                room.getPlayersName().stream()
+                        .filter(name -> !name.equals(requestPlayerName))
+                        .findFirst()
+                        .orElse(null) : null;
 
         // 构建房间信息消息
         GameMessage roomInfo = new GameMessage();
@@ -187,24 +187,24 @@ public class GameRoomService {
         roomInfo.setRoomId(roomId);
         roomInfo.setPlayerId(requestPlayerId);
         roomInfo.setPlayerName(requestPlayerName);
-        
+
         // 获取请求玩家的头像
         String playerAvatar = userService.getUserById(Long.parseLong(requestPlayerId))
                 .map(User::getImgSrc)
                 .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + requestPlayerName);
         roomInfo.setPlayerAvatar(playerAvatar);
-        
+
         roomInfo.setOpponentId(opponentId);
         roomInfo.setOpponentName(opponentName);
-        
+
         // 获取对手的头像
-        String opponentAvatar = opponentId != null ? 
-            userService.getUserById(Long.parseLong(opponentId))
-                    .map(User::getImgSrc)
-                    .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName) 
-            : null;
+        String opponentAvatar = opponentId != null ?
+                userService.getUserById(Long.parseLong(opponentId))
+                        .map(User::getImgSrc)
+                        .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName)
+                : null;
         roomInfo.setOpponentAvatar(opponentAvatar);
-        
+
         roomInfo.setLanguage(room.getLanguage().toString());
         roomInfo.setCategory(room.getCategory().toString());
         roomInfo.setDifficulty(room.getDifficulty());
@@ -224,28 +224,32 @@ public class GameRoomService {
             // 根据isReady参数设置房间状态
             GameStatus newStatus = isReady ? GameStatus.READY : GameStatus.WAITING;
             setGameStatus(room, newStatus);
-            
+
             // 找到另一个玩家的ID
             String otherPlayerId = room.getPlayersId().stream()
-                .filter(id -> !id.equals(playerId))
-                .findFirst()
-                .orElse(null);
-            
+                    .filter(id -> !id.equals(playerId))
+                    .findFirst()
+                    .orElse(null);
+
             if (otherPlayerId != null) {
                 // 通知另一个玩家
                 messagingTemplate.convertAndSend(
-                    "/queue/room/" + otherPlayerId + "/info",
-                    new GameMessage() {{
-                        setType("PLAYER_READY");
-                        setPlayerId(playerId);          // 准备的玩家ID
-                        setPlayerName(playerName);      // 准备的玩家名称
-                        setRoomId(roomId);
-                        setIsReady(isReady);  // 设置准备状态
-                        setRoomStatus(newStatus.toString());
-                        setTimestamp(System.currentTimeMillis());
-                    }}
+                        "/queue/room/" + otherPlayerId + "/info",
+                        new GameMessage() {{
+                            setType("PLAYER_READY");
+                            setPlayerId(playerId);          // 准备的玩家ID
+                            setPlayerName(playerName);      // 准备的玩家名称
+                            setRoomId(roomId);
+                            setIsReady(isReady);  // 设置准备状态
+                            setRoomStatus(newStatus.toString());
+                            setTimestamp(System.currentTimeMillis());
+                        }}
                 );
             }
         }
+    }
+
+    public String myMethod() {
+        return "Expected Result";
     }
 }

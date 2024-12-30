@@ -1,14 +1,18 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-10 10:17:27
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-10 11:12:07
  */
 package com.example.demo.entity;
 
-import com.example.demo.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,26 +30,62 @@ public class PlayerProfile {
     @JsonIgnore // 避免返回User对象时出现循环引用
     private User user;
 
-    @Column(name = "userLevel") 
+    @Column(name = "user_level") 
     private String userLevel = "无等级";    // 用户等级（段位）
 
-    @Column(name = "win") 
-    private int win;  // 胜利场数
+    // === 排位赛数据 ===
+    @Column(name = "ranked_matches_played")
+    private int rankedMatchesPlayed = 0;  // 排位赛场数
 
-    @Column(name = "speed")      
-    private double speed;        // 均速
+    @Column(name = "ranked_wins")
+    private int rankedWins = 0;  // 排位赛胜场
 
-    @Column(name = "winRate") 
-    private double winRate;      // 胜率
+    @Column(name = "ranked_win_rate")
+    private double rankedWinRate = 0.0;  // 排位赛胜率
 
-    @Column(name = "accuracyRate")
-    private double accuracyRate;  // 准确率
+    @Column(name = "ranked_avg_wpm")
+    private double rankedAvgWpm = 0.0;  // 排位赛平均速度
 
-    @Column(name = "rankScore")
-    private int rankScore = 500; // 初始设置为500分
+    @Column(name = "ranked_avg_accuracy")
+    private double rankedAvgAccuracy = 0.0;  // 排位赛平均准确率
 
-    @Column(name = "matchesPlayed")
-    private int matchesPlayed = 0; // 总比赛场数
+    @Column(name = "rank_score")
+    private int rankScore = 500;  // 段位积分
+
+    // === 非排位赛数据 ===
+    @Column(name = "casual_matches_played")
+    private int casualMatchesPlayed = 0;  // 非排位赛场数
+
+    @Column(name = "casual_wins")
+    private int casualWins = 0;  // 非排位赛胜场
+
+    @Column(name = "casual_win_rate")
+    private double casualWinRate = 0.0;  // 非排位赛胜率
+
+    @Column(name = "casual_avg_wpm")
+    private double casualAvgWpm = 0.0;  // 非排位赛平均速度
+
+    @Column(name = "casual_avg_accuracy")
+    private double casualAvgAccuracy = 0.0;  // 非排位赛平均准确率
+
+    // === 总体数据 ===
+    @Column(name = "total_matches_played")
+    private int totalMatchesPlayed = 0;  // 总场数
+
+    @Column(name = "total_wins")
+    private int totalWins = 0;  // 总胜场
+
+    @Column(name = "highest_wpm")
+    private double highestWpm = 0.0; // 最高速度
+
+    @Column(name = "total_win_rate")
+    private double totalWinRate = 0.0;  // 总胜率
+
+    @Column(name = "total_avg_wpm")
+    private double totalAvgWpm = 0.0;  // 总平均速度
+
+    @Column(name = "total_avg_accuracy")
+    private double totalAvgAccuracy = 0.0;  // 总平均准确率
 }
 
 

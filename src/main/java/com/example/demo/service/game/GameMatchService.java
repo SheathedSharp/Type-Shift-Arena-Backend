@@ -4,7 +4,9 @@
  */
 package com.example.demo.service.game;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -159,5 +161,26 @@ public class GameMatchService {
     // 通过ID查询比赛记录
     public Optional<GameMatch> getMatchById(String id) {
         return gameMatchRepository.findById(id);
+    }
+
+    public List<GameMatch> getPlayerMatches(Long playerId) {
+        // 查询该玩家作为player1或player2的所有比赛
+        return gameMatchRepository.findByPlayer1IdOrPlayer2Id(playerId, playerId);
+    }
+
+    // 获取玩家的排位赛记录
+    public List<GameMatch> getPlayerRankedMatches(Long playerId) {
+        return gameMatchRepository.findByPlayer1IdOrPlayer2Id(playerId, playerId)
+            .stream()
+            .filter(GameMatch::isRanked)
+            .collect(Collectors.toList());
+    }
+
+    // 获取玩家的非排位赛记录
+    public List<GameMatch> getPlayerCasualMatches(Long playerId) {
+        return gameMatchRepository.findByPlayer1IdOrPlayer2Id(playerId, playerId)
+            .stream()
+            .filter(match -> !match.isRanked())
+            .collect(Collectors.toList());
     }
 }

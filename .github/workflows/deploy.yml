@@ -71,7 +71,11 @@ jobs:
 
         # 上传新的 JAR 文件
         echo "Copying JAR file to server..."
-        sshpass -p "$SSH_PASSWORD" scp -v -o StrictHostKeyChecking=no $JAR_FILE $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/
+        # 先压缩 JAR 文件
+        gzip -9 $JAR_FILE
+        sshpass -p "$SSH_PASSWORD" scp -v -o StrictHostKeyChecking=no "${JAR_FILE}.gz" $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/
+        # 在服务器上解压
+        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST "cd $BACKEND_PATH && gunzip -f $(basename ${JAR_FILE}).gz"
 
         # 启动新应用
         JAR_BASENAME=$(basename $JAR_FILE)

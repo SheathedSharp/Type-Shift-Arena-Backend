@@ -156,8 +156,10 @@
 							<artifactId>asciitable</artifactId>
 						</exclude>
 					</excludes>
-					<!-- 使用瘦 JAR 包 -->
-					<layout>LAYERED_JAR</layout>
+					<!-- 使用分层打包 -->
+					<layers>
+						<enabled>true</enabled>
+					</layers>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -27,7 +27,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(0, message, data);
+        return new ApiResponse<>(200, message, data);
     }
 
     // 错误响应的静态工厂方法

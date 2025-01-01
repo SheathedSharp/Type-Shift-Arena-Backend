@@ -1,43 +1,45 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
+ * @Date: 2024-11-30 00:17:44
+ */
+/*
+ * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:23
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-15 21:40:12
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2024-12-30 14:09:02
  */
 package com.example.demo.service.game;
 
-import com.example.demo.model.game.GameRoom;
-import com.example.demo.model.game.GameStatus;
-import com.example.demo.entity.enums.TextLanguage;
-import com.example.demo.entity.enums.TextCategory;
-import com.example.demo.model.game.GameMessage;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.example.demo.service.user.UserService;
 import com.example.demo.entity.User;
+import com.example.demo.entity.enums.TextCategory;
+import com.example.demo.entity.enums.TextLanguage;
+import com.example.demo.model.game.GameMessage;
+import com.example.demo.model.game.GameRoom;
+import com.example.demo.model.game.GameStatus;
+import com.example.demo.service.user.UserService;
 
 @Service
 public class GameRoomService {
     private final Map<String, GameRoom> rooms = new ConcurrentHashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(GameRoomService.class);
     private final SimpMessagingTemplate messagingTemplate;
-    private final GameTextService gameTextService;
     private final UserService userService;
     private static final int MAX_PLAYERS = 2;
+    private static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int ROOM_ID_LENGTH = 6;
 
     @Autowired
-    public GameRoomService(SimpMessagingTemplate messagingTemplate, GameTextService gameTextService, UserService userService) {
+    public GameRoomService(SimpMessagingTemplate messagingTemplate, UserService userService) {
         this.messagingTemplate = messagingTemplate;
-        this.gameTextService = gameTextService;
         this.userService = userService;
     }
 
@@ -49,100 +51,162 @@ public class GameRoomService {
         room.setCategory(category);
         room.setDifficulty(difficulty);
         
-        // 获取并设置目标文本
-        String targetText = gameTextService.getRandomText(language, category, difficulty);
-        room.setTargetText(targetText);
-        
         // 存储房间
         rooms.put(roomId, room);
         
         return room;
     }
 
-    // 添加一个使用默认参数的重载方法
-    public GameRoom createRoom(String roomId) {
-        return createRoom(
-            roomId,
-            TextLanguage.ENGLISH,  // 默认使用英语
-            TextCategory.DAILY_CHAT,  // 默认使用日常对话
-            "EASY"  // 默认使用简单难度
-        );
-    }
-
     public GameRoom getRoom(String roomId) {
         return rooms.get(roomId);
     }
 
-    public GameRoom joinRoom(String roomId, String playerId, String playerName, 
-                            TextLanguage language, TextCategory category, String difficulty) {
+    public void playerJoin(String roomId, String playerId, String playerName) {
         GameRoom room = rooms.get(roomId);
         if (room == null) {
-            // 使用传入的参数创建房间
-            room = createRoom(roomId, language, category, difficulty);
+            // 如果房间不存在，返回 null
+            return ;
         }
         
-        if (addPlayer(room, playerId, playerName)) {
-            if (isRoomFull(room)) {
-                setGameStatus(room, GameStatus.READY);
-            }
+        // 检查房间是否已满
+        if (isRoomFull(room)) {
+            throw new IllegalStateException("Room is full");
         }
         
-        return room;
+        // 检查玩家是否已在房间中
+        if (hasPlayer(room, playerId)) {
+            throw new IllegalStateException("Player already in room");
+        }
+        
+        // 添加玩家到房间
+        addPlayer(room, playerId, playerName);
+        
+        // 找到另一个玩家的ID
+        String otherPlayerId = room.getPlayersId().stream()
+            .filter(id -> !id.equals(playerId))
+            .findFirst()
+            .orElse(null);
+
+        String otherPlayerName = room.getPlayersName().stream()
+            .filter(name -> !name.equals(playerName))
+            .findFirst()
+            .orElse(null);
+
+        if (otherPlayerId != null) {
+            // 获取对手信息
+            Map<String, String> opponentInfo = getOpponentInfo(room, otherPlayerId, otherPlayerName);
+
+            GameMessage message = new GameMessage();
+            message.setType("PLAYER_JOIN");
+            message.setRoomId(room.getId());
+            message.setPlayerId(otherPlayerId);
+            message.setPlayerName(otherPlayerName);
+            String avatar = !otherPlayerId.isEmpty() ? 
+                userService.getUserById(Long.parseLong(otherPlayerId))
+                        .map(User::getImgSrc)
+                        .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + otherPlayerName) 
+                : "";  // 使用空字符串替代null
+            message.setPlayerAvatar(avatar);
+            message.setOpponentId(opponentInfo.get("id"));
+            message.setOpponentName(opponentInfo.get("name"));
+            message.setOpponentAvatar(opponentInfo.get("avatar"));
+            message.setIsHost(isPlayerHost(room, otherPlayerId));
+            message.setRoomStatus(room.getStatus().toString());
+            message.setPlayersId(room.getPlayersId());
+            message.setPlayersName(room.getPlayersName());
+            message.setPlayersCount(room.getPlayersId().size());
+            message.setTimestamp(System.currentTimeMillis());
+        
+
+            // 通知另一个玩家
+            messagingTemplate.convertAndSend(
+                "/queue/room/" + otherPlayerId + "/info",
+                message
+            );
+        }
     }
 
-    // 添加一个使用默认参数的重载方法
-    public GameRoom joinRoom(String roomId, String playerId, String playerName) {
-        return joinRoom(
-            roomId,
-            playerId,
-            playerName,
-            TextLanguage.ENGLISH,  // 默认使用英语
-            TextCategory.DAILY_CHAT,  // 默认使用日常对话
-            "EASY"  // 默认使用简单难度
-        );
-    }
-
-    public void leaveRoom(String roomId, String playerId, String playerName) {
+    public void playerLeave(String roomId, String playerId, String playerName) {
         GameRoom room = rooms.get(roomId);
         if (room != null) {
-            if (removePlayer(room, playerId, playerName)) {
-                rooms.remove(roomId);
-            } else {
-                setGameStatus(room, GameStatus.WAITING);
+            if (removePlayer(room, playerId, playerName)) {          // 如果房间为空
+                rooms.remove(roomId); // 移除房间
+            } else {                // 如果房间不空
+                // 找到另一个玩家的ID
+                String otherPlayerId = room.getPlayersId().stream()
+                    .filter(id -> !id.equals(playerId))
+                    .findFirst()
+                    .orElse(null);
+
+                String otherPlayerName = room.getPlayersName().stream()
+                    .filter(name -> !name.equals(playerName))
+                    .findFirst()
+                    .orElse(null);
+
+                if (otherPlayerId != null) {
+                    GameMessage message = new GameMessage();
+                    message.setType("PLAYER_LEAVE");
+                    message.setRoomId(room.getId());
+                    message.setPlayerId(otherPlayerId);
+                    message.setPlayerName(otherPlayerName);
+                    String avatar = !otherPlayerId.isEmpty() ? 
+                        userService.getUserById(Long.parseLong(otherPlayerId))
+                                .map(User::getImgSrc)
+                                .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + otherPlayerName) 
+                        : "";  // 使用空字符串替代null
+                    message.setPlayerAvatar(avatar);
+                    message.setOpponentId("");
+                    message.setOpponentName("");
+                    message.setOpponentAvatar("");
+                    message.setPlayersId(room.getPlayersId());
+                    message.setPlayersName(room.getPlayersName());
+                    message.setRoomStatus(room.getStatus().toString());
+                    message.setIsHost(isPlayerHost(room, otherPlayerId));
+                    message.setTimestamp(System.currentTimeMillis());
+
+                    // 通知另一个玩家
+                    messagingTemplate.convertAndSend(
+                        "/queue/room/" + otherPlayerId + "/info",
+                        message
+                    );
+                }
+
+                room.setStatus(GameStatus.WAITING);
             }
         }
+
+        
     }
 
     public boolean roomExists(String roomId) {
         return rooms.containsKey(roomId);
     }
 
-    public void updateGameStatus(String roomId, GameStatus status) {
-        GameRoom room = rooms.get(roomId);
-        if (room != null) {
-            setGameStatus(room, status);
-        }
-    }
-
-    public void setGameStatus(GameRoom room, GameStatus status) {
-        room.setStatus(status);
-        if (status == GameStatus.PLAYING) {
-            room.setStartTime(System.currentTimeMillis());
-        }
-    }
-
     public boolean addPlayer(GameRoom room, String playerId, String playerName) {
         if (!isRoomFull(room)) {
             room.getPlayersId().add(playerId);
             room.getPlayersName().add(playerName);
+            if (isRoomFull(room)) {
+                room.setStatus(GameStatus.READY);
+            }else {
+                room.setStatus(GameStatus.WAITING);
+            }
             return true;
         }
         return false;
     }
 
     public boolean removePlayer(GameRoom room, String playerId, String playerName) {
+        // 更新房主        
+        if (isPlayerHost(room, playerId)) {
+            room.setHostId(room.getPlayersId().stream()
+                .filter(id -> !id.equals(playerId))
+                .findFirst()
+                .orElse(null));
+        }
         room.getPlayersId().remove(playerId);
         room.getPlayersName().remove(playerName);
+        room.setStatus(GameStatus.WAITING);
         return room.getPlayersId().isEmpty();
     }
 
@@ -155,31 +219,58 @@ public class GameRoomService {
     }
 
     public boolean isPlayerHost(GameRoom room, String playerId) {
-        return !room.getPlayersId().isEmpty() && 
-               room.getPlayersId().iterator().next().equals(playerId);
+        return room.getHostId() != null && room.getHostId().equals(playerId);
     }
 
     public boolean hasPlayer(GameRoom room, String playerId) {
         return room.getPlayersId().contains(playerId);
     }
 
-    public GameMessage getRoomInfo(String roomId, String requestPlayerId, String requestPlayerName) {
-        GameRoom room = getRoom(roomId);
-        if (room == null) {
-            return null;
+    // 获取对手信息
+    private Map<String, String> getOpponentInfo(GameRoom room, String currentPlayerId, String currentPlayerName) {
+        Map<String, String> opponentInfo = new ConcurrentHashMap<>();
+        
+        if (room == null || currentPlayerId == null) {
+            // 如果房间或当前玩家ID为空，返回空Map
+            return opponentInfo;
         }
 
-        // 找出对手信息
+        // 找出对手ID
         String opponentId = room.getPlayersId().stream()
-            .filter(id -> !id.equals(requestPlayerId))
+            .filter(id -> !id.equals(currentPlayerId))
             .findFirst()
-            .orElse(null);
+            .orElse("");  // 使用空字符串替代null
             
-        String opponentName = opponentId != null ? 
+        // 找出对手名称
+        String opponentName = !opponentId.isEmpty() ? 
             room.getPlayersName().stream()
-                .filter(name -> !name.equals(requestPlayerName))
+                .filter(name -> !name.equals(currentPlayerName))
                 .findFirst()
-                .orElse(null) : null;
+                .orElse("") : "";  // 使用空字符串替代null
+                
+        // 获取对手头像
+        String opponentAvatar = !opponentId.isEmpty() ? 
+            userService.getUserById(Long.parseLong(opponentId))
+                    .map(User::getImgSrc)
+                    .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName) 
+            : "";  // 使用空字符串替代null
+            
+        // 只有在值不为空时才放入Map
+        if (!opponentId.isEmpty()) opponentInfo.put("id", opponentId);
+        if (!opponentName.isEmpty()) opponentInfo.put("name", opponentName);
+        if (!opponentAvatar.isEmpty()) opponentInfo.put("avatar", opponentAvatar);
+        
+        return opponentInfo;
+    }
+
+    public void getRoomInfo(String roomId, String requestPlayerId, String requestPlayerName) {
+        GameRoom room = getRoom(roomId);
+        if (room == null) {
+            return ;
+        }
+
+        // 获取对手信息
+        Map<String, String> opponentInfo = getOpponentInfo(room, requestPlayerId, requestPlayerName);
 
         // 构建房间信息消息
         GameMessage roomInfo = new GameMessage();
@@ -194,16 +285,10 @@ public class GameRoomService {
                 .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + requestPlayerName);
         roomInfo.setPlayerAvatar(playerAvatar);
         
-        roomInfo.setOpponentId(opponentId);
-        roomInfo.setOpponentName(opponentName);
-        
-        // 获取对手的头像
-        String opponentAvatar = opponentId != null ? 
-            userService.getUserById(Long.parseLong(opponentId))
-                    .map(User::getImgSrc)
-                    .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName) 
-            : null;
-        roomInfo.setOpponentAvatar(opponentAvatar);
+        // 设置对手信息
+        roomInfo.setOpponentId(opponentInfo.get("id"));
+        roomInfo.setOpponentName(opponentInfo.get("name"));
+        roomInfo.setOpponentAvatar(opponentInfo.get("avatar"));
         
         roomInfo.setLanguage(room.getLanguage().toString());
         roomInfo.setCategory(room.getCategory().toString());
@@ -213,18 +298,18 @@ public class GameRoomService {
         roomInfo.setTargetText(room.getTargetText());
         roomInfo.setStartTime(room.getStartTime());
         roomInfo.setTimestamp(System.currentTimeMillis());
-        roomInfo.setIsHost(room.getHostId().equals(requestPlayerId));
+        roomInfo.setIsHost(isPlayerHost(room, requestPlayerId));        // 设置是否为房主
 
-        return roomInfo;
+        // 发送房间信息给请求的玩家
+        messagingTemplate.convertAndSend(
+            "/queue/room/" + requestPlayerId + "/info",
+            roomInfo
+        );
     }
 
     public void playerReady(String roomId, String playerId, String playerName, Boolean isReady) {
         GameRoom room = getRoom(roomId);
-        if (room != null) {
-            // 根据isReady参数设置房间状态
-            GameStatus newStatus = isReady ? GameStatus.READY : GameStatus.WAITING;
-            setGameStatus(room, newStatus);
-            
+        if (room != null) {            
             // 找到另一个玩家的ID
             String otherPlayerId = room.getPlayersId().stream()
                 .filter(id -> !id.equals(playerId))
@@ -241,11 +326,43 @@ public class GameRoomService {
                         setPlayerName(playerName);      // 准备的玩家名称
                         setRoomId(roomId);
                         setIsReady(isReady);  // 设置准备状态
-                        setRoomStatus(newStatus.toString());
+                        setRoomStatus(room.getStatus().toString());
                         setTimestamp(System.currentTimeMillis());
                     }}
                 );
             }
+        }
+    }
+
+    public List<GameRoom> getCustomRooms() {
+        return rooms.values().stream()
+                .filter(room -> !room.isRanked())
+                .collect(Collectors.toList());
+    }
+
+    public int getCustomRoomsCount() {
+        return (int) rooms.values().stream()
+                .filter(room -> !room.isRanked())
+                .count();
+    }
+
+    public String generateRoomId() {
+        StringBuilder sb = new StringBuilder();
+        Random random = new Random();
+        
+        while (true) {
+            // 生成6位随机字符的房间ID
+            for (int i = 0; i < ROOM_ID_LENGTH; i++) {
+                int index = random.nextInt(CHARS.length());
+                sb.append(CHARS.charAt(index));
+            }
+            
+            String roomId = sb.toString();
+            // 确保生成的ID是唯一的
+            if (!rooms.containsKey(roomId)) {
+                return roomId;
+            }
+            sb.setLength(0); // 清空重试
         }
     }
 }

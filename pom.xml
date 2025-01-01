@@ -136,13 +136,28 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.2.5</version>
 				<configuration>
-					<failIfNoTests>false</failIfNoTests>
+					<!-- 排除测试依赖 -->
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-starter-test</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.springframework.security</groupId>
+							<artifactId>spring-security-test</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>de.vandermeer</groupId>
+							<artifactId>asciitable</artifactId>
+						</exclude>
+					</excludes>
+					<!-- 使用瘦 JAR 包 -->
+					<layout>LAYERED_JAR</layout>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -1,35 +1,38 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
- * @Date: 2024-10-28 21:13:26
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-10-28 21:13:30
+ * @Date: 2024-11-30 00:17:44
  */
-package com.example.demo.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
+package com.example.demo.security;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
-public class JwtTokenUtil {
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
+@Component // 标记为 Spring 组件，使其能够被 Spring 自动扫描并注册为 Bean。
+public class JwtTokenUtil {
+    // 注入 JWT 密钥和过期时间
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    // 获取签名密钥
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
+    // 生成 JWT 令牌
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
@@ -41,6 +44,7 @@ public class JwtTokenUtil {
                 .compact();
     }
 
+    // 从 JWT 令牌中获取用户名
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -50,6 +54,7 @@ public class JwtTokenUtil {
                 .getSubject();
     }
 
+    // 验证 JWT 令牌是否有效
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
             String username = getUsernameFromToken(token);
@@ -59,6 +64,7 @@ public class JwtTokenUtil {
         }
     }
 
+    // 检查 JWT 令牌是否过期
     private boolean isTokenExpired(String token) {
         Date expiration = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

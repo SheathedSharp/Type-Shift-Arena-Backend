@@ -1,15 +1,13 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 20:03:08
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-10 12:26:55
  */
 package com.example.demo.model.game;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -18,8 +16,8 @@ import lombok.AllArgsConstructor;
 public class GameProgress {
     private String type;
     private String playerId;
-    private double percentage;
     private Stats stats;
+    private long timestamp;
 
     @Getter
     @Setter
@@ -29,6 +27,7 @@ public class GameProgress {
         private double wpm;
         private double accuracy;
         private int errorCount;
+        private double progress;
         private String username;
     }
 }

@@ -71,7 +71,7 @@ jobs:
 
         # 上传新的 JAR 文件
         echo "Copying JAR file to server..."
-        sshpass -p "$SSH_PASSWORD" scp -o StrictHostKeyChecking=no $JAR_FILE $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/
+        sshpass -p "$SSH_PASSWORD" scp -v -o StrictHostKeyChecking=no $JAR_FILE $SERVER_USER@$SERVER_HOST:$BACKEND_PATH/
 
         # 启动新应用
         JAR_BASENAME=$(basename $JAR_FILE)

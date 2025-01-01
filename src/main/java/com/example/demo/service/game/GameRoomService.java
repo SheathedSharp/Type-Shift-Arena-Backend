@@ -28,6 +28,9 @@ import com.example.demo.model.game.GameRoom;
 import com.example.demo.model.game.GameStatus;
 import com.example.demo.service.user.UserService;
 
+import com.example.demo.service.user.UserService;
+import com.example.demo.entity.User;
+
 @Service
 public class GameRoomService {
     private final Map<String, GameRoom> rooms = new ConcurrentHashMap<>();

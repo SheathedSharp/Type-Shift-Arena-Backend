@@ -9,11 +9,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.context.TestPropertySource;
 
 import com.example.demo.entity.GameText;
 import com.example.demo.entity.enums.TextLanguage;
+import com.example.demo.entity.enums.TextCategory;
+import java.time.LocalDateTime;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@TestPropertySource(locations = "classpath:application-test.properties")
 class GameTextRepositoryTest {
 
     @Autowired
@@ -29,6 +35,11 @@ class GameTextRepositoryTest {
         gameText.setLanguage(TextLanguage.CHINESE);
         gameText.setContent("测试文本");
         gameText.setTitle("测试标题");
+        gameText.setDifficulty("EASY");
+        gameText.setIsCustom(false);
+        gameText.setCategory(TextCategory.LITERATURE);
+        gameText.setCreatedAt(LocalDateTime.now());
+        
         entityManager.persist(gameText);
         entityManager.flush();
 

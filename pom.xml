@@ -20,6 +20,7 @@
 		<java.version>17</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<springdoc.version>2.3.0</springdoc.version>
 	</properties>
 
 	<repositories>
@@ -61,6 +62,7 @@
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
 			<version>3.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Spring Boot Starter Test -->
@@ -74,7 +76,8 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.3.0</version>
+			<version>${springdoc.version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Spring Boot Starter WebSocket -->
@@ -112,7 +115,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Spring Security Test -->
@@ -127,6 +130,21 @@
 			<groupId>de.vandermeer</groupId>
 			<artifactId>asciitable</artifactId>
 			<version>0.3.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Springdoc OpenAPI -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-common</artifactId>
+			<version>${springdoc.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- H2 Database for Testing -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -155,9 +173,18 @@
 							<groupId>de.vandermeer</groupId>
 							<artifactId>asciitable</artifactId>
 						</exclude>
+						<exclude>
+							<groupId>org.springdoc</groupId>
+							<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.springdoc</groupId>
+							<artifactId>springdoc-openapi-starter-common</artifactId>
+						</exclude>
 					</excludes>
-					<!-- 使用瘦 JAR 包 -->
-					<layout>LAYERED_JAR</layout>
+					<!-- 启用瘦身打包 -->
+					<excludeDevtools>true</excludeDevtools>
+					<minimizeJar>true</minimizeJar>
 				</configuration>
 			</plugin>
 		</plugins>

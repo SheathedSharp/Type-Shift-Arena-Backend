@@ -89,6 +89,8 @@ public class GameRoomControllerTest {
         mockRoom.setCategory(TextCategory.DAILY_CHAT);
         mockRoom.setDifficulty("EASY");
         mockRoom.setTargetText("Test target text");
+        mockRoom.getPlayersId().add("test-player-123");
+        mockRoom.getPlayersName().add("Test Player");
     }
 
     @AfterEach

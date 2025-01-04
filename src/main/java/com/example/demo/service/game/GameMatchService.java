@@ -52,9 +52,9 @@ public class GameMatchService {
         match.setTargetText(matchDTO.getTargetText());
         
         // 设置玩家信息
-        User player1 = userService.getUserById(Long.parseLong(matchDTO.getPlayer1Id()))
+        User player1 = userService.getUserById(matchDTO.getPlayer1Id())
             .orElseThrow(() -> new RuntimeException("Player 1 not found"));
-        User player2 = userService.getUserById(Long.parseLong(matchDTO.getPlayer2Id()))
+        User player2 = userService.getUserById(matchDTO.getPlayer2Id())
             .orElseThrow(() -> new RuntimeException("Player 2 not found"));
         
         match.setPlayer1(player1);
@@ -62,7 +62,7 @@ public class GameMatchService {
         
         // 设置胜者
         if (matchDTO.getWinnerId() != null) {
-            User winner = userService.getUserById(Long.parseLong(matchDTO.getWinnerId()))
+            User winner = userService.getUserById(matchDTO.getWinnerId())
                 .orElseThrow(() -> new RuntimeException("Winner not found"));
             match.setWinner(winner);
         }
@@ -79,9 +79,9 @@ public class GameMatchService {
         
         // 如果是排位赛，计算积分变化
         PlayerProfile player1Profile = playerProfileService.getPlayerProfileById(        // 获取玩家档案
-            Long.parseLong(matchDTO.getPlayer1Id()));
+            matchDTO.getPlayer1Id());
         PlayerProfile player2Profile = playerProfileService.getPlayerProfileById(        // 获取玩家档案
-            Long.parseLong(matchDTO.getPlayer2Id()));
+            matchDTO.getPlayer2Id());
 
         int player1ScoreChange = 0;
         int player2ScoreChange = 0;
@@ -141,7 +141,7 @@ public class GameMatchService {
     private void updatePlayerProfiles(GameMatchDTO matchDTO) {
         // 更新玩家1的档案
         playerProfileService.updatePlayerStats(
-            Long.parseLong(matchDTO.getPlayer1Id()),
+            matchDTO.getPlayer1Id(),
             matchDTO.getPlayer1Wpm(),
             matchDTO.getPlayer1Accuracy(),
             matchDTO.getWinnerId().equals(matchDTO.getPlayer1Id()),
@@ -150,7 +150,7 @@ public class GameMatchService {
         
         // 更新玩家2的档案
         playerProfileService.updatePlayerStats(
-            Long.parseLong(matchDTO.getPlayer2Id()),
+            matchDTO.getPlayer2Id(),
             matchDTO.getPlayer2Wpm(),
             matchDTO.getPlayer2Accuracy(),
             matchDTO.getWinnerId().equals(matchDTO.getPlayer2Id()),
@@ -163,13 +163,13 @@ public class GameMatchService {
         return gameMatchRepository.findById(id);
     }
 
-    public List<GameMatch> getPlayerMatches(Long playerId) {
+    public List<GameMatch> getPlayerMatches(String playerId) {
         // 查询该玩家作为player1或player2的所有比赛
         return gameMatchRepository.findByPlayer1IdOrPlayer2Id(playerId, playerId);
     }
 
     // 获取玩家的排位赛记录
-    public List<GameMatch> getPlayerRankedMatches(Long playerId) {
+    public List<GameMatch> getPlayerRankedMatches(String playerId) {
         return gameMatchRepository.findByPlayer1IdOrPlayer2Id(playerId, playerId)
             .stream()
             .filter(GameMatch::isRanked)
@@ -177,7 +177,7 @@ public class GameMatchService {
     }
 
     // 获取玩家的非排位赛记录
-    public List<GameMatch> getPlayerCasualMatches(Long playerId) {
+    public List<GameMatch> getPlayerCasualMatches(String playerId) {
         return gameMatchRepository.findByPlayer1IdOrPlayer2Id(playerId, playerId)
             .stream()
             .filter(match -> !match.isRanked())

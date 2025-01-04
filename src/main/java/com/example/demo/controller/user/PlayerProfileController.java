@@ -27,7 +27,7 @@ public class PlayerProfileController {
     
     @Operation(summary = "Get a player profile by ID", description = "Returns a player profile as per the id")
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PlayerProfileDTO>> getPlayerProfile(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<PlayerProfileDTO>> getPlayerProfile(@PathVariable String id) {
         PlayerProfile profile = playerProfileService.getPlayerProfileById(id);
         if (profile == null) {
             return ResponseEntity.notFound().build();

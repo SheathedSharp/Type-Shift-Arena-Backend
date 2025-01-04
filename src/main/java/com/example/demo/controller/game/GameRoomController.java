@@ -2,7 +2,7 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-12-30 14:03:02
+ * @LastEditTime: 2025-01-04 11:36:41
  */
 package com.example.demo.controller.game;
 
@@ -160,7 +160,7 @@ public class GameRoomController {
                         playerInfo.put("name", playerName);
                         
                         // 获取玩家头像
-                        userService.getUserById(Long.parseLong(playerId))
+                        userService.getUserById(playerId)
                                 .ifPresent(user -> {
                                     playerInfo.put("avatar", user.getImgSrc());
                                 });
@@ -171,7 +171,7 @@ public class GameRoomController {
                         }
                         
                         // 获取玩家等级信息
-                        PlayerProfile profile = playerProfileService.getPlayerProfileById(Long.parseLong(playerId));
+                        PlayerProfile profile = playerProfileService.getPlayerProfileById(playerId);
                         if (profile != null) {
                             playerInfo.put("level", profile.getUserLevel());
                             playerInfo.put("rankScore", profile.getRankScore());

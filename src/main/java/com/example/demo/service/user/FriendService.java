@@ -1,26 +1,24 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-07 08:26:55
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-10 10:46:38
  */
 package com.example.demo.service.user;
 
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
 
 @Service
 public class FriendService {
     @Autowired
     private UserRepository userRepository;
 
-    public Set<User> getFriends(Long userId) {
+    public Set<User> getFriends(String userId) {
         return userRepository.findById(userId)
                 .map(User::getFriends)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -30,7 +28,7 @@ public class FriendService {
         return userRepository.findByUsernameContaining(username);
     }
 
-    public void addFriend(Long userId, Long friendId) {
+    public void addFriend(String userId, String friendId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         User friend = userRepository.findById(friendId)
@@ -43,7 +41,7 @@ public class FriendService {
         userRepository.save(friend);
     }
 
-    public void removeFriend(Long userId, Long friendId) {
+    public void removeFriend(String userId, String friendId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         User friend = userRepository.findById(friendId)

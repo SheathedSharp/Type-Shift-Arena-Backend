@@ -1,23 +1,22 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-14 22:00:32
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-12-30 19:44:07
  */
 package com.example.demo.model.dto;
 
 import com.example.demo.entity.PlayerProfile;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayerProfileDTO {
-    private Long id;
+    private String id;
     private String username;
     private String userLevel;
     

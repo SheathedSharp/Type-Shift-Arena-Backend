@@ -13,6 +13,6 @@ import com.example.demo.entity.GameMatch;
 
 @Repository
 public interface GameMatchRepository extends JpaRepository<GameMatch, String> { // 改为String类型
-    List<GameMatch> findByPlayer1IdOrPlayer2Id(Long player1Id, Long player2Id);
-    List<GameMatch> findByWinnerId(Long winnerId);
+    List<GameMatch> findByPlayer1IdOrPlayer2Id(String player1Id, String player2Id);
+    List<GameMatch> findByWinnerId(String winnerId);
 }

@@ -4,7 +4,7 @@ USE myappdb;
 
 -- 创建用户表
 CREATE TABLE IF NOT EXISTS users (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- 创建玩家信息表
 CREATE TABLE IF NOT EXISTS player_profile (
-    user_id BIGINT PRIMARY KEY,
+    user_id VARCHAR(36) PRIMARY KEY,
     user_level VARCHAR(50) DEFAULT '无等级',
     
     -- 排位赛数据
@@ -46,8 +46,8 @@ CREATE TABLE IF NOT EXISTS player_profile (
 
 -- 创建游戏好友表
 CREATE TABLE IF NOT EXISTS user_friends (
-    user_id BIGINT,
-    friend_id BIGINT,
+    user_id VARCHAR(36),
+    friend_id VARCHAR(36),
     PRIMARY KEY (user_id, friend_id),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (friend_id) REFERENCES users(id)
@@ -77,9 +77,9 @@ CREATE TABLE IF NOT EXISTS game_texts (
 CREATE TABLE IF NOT EXISTS game_matches (
     id VARCHAR(36) PRIMARY KEY,
     room_id VARCHAR(255) NOT NULL,
-    player1_id BIGINT NOT NULL,
-    player2_id BIGINT NOT NULL,
-    winner_id BIGINT,
+    player1_id VARCHAR(36) NOT NULL,
+    player2_id VARCHAR(36) NOT NULL,
+    winner_id VARCHAR(36),
     language VARCHAR(50) NOT NULL,
     category VARCHAR(50) NOT NULL,
     difficulty VARCHAR(50) NOT NULL,

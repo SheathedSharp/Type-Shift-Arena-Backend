@@ -4,12 +4,17 @@
  */
 package com.example.demo.service.user;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.MessageStatus;
@@ -19,19 +24,40 @@ import com.example.demo.repository.UserRepository;
 
 @Service
 public class FriendService {
+    private static final Logger logger = LoggerFactory.getLogger(FriendService.class);
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private MessageRepository messageRepository;
 
+    @Lazy
     @Autowired
     private UserOnlineService userOnlineService;
 
+    @Transactional(readOnly = true)
     public Set<User> getFriends(String userId) {
-        return userRepository.findById(userId)
-                .map(User::getFriends)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            if (userId == null) {
+                logger.warn("Attempted to get friends for null userId");
+                return Collections.emptySet();
+            }
+
+            return userRepository.findById(userId)
+                    .map(user -> {
+                        Set<User> friends = user.getFriends();
+                        logger.debug("Retrieved {} friends for user {}", friends.size(), userId);
+                        return friends;
+                    })
+                    .orElseGet(() -> {
+                        logger.warn("User not found with ID: {}", userId);
+                        return Collections.emptySet();
+                    });
+        } catch (Exception e) {
+            logger.error("Error retrieving friends for user {}: {}", userId, e.getMessage());
+            return Collections.emptySet();
+        }
     }
 
     public List<User> searchFriends(String username) {

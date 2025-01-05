@@ -1,8 +1,6 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-29 22:46:56
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2025-01-04 11:36:41
  */
 package com.example.demo.controller.game;
 
@@ -275,7 +273,7 @@ public class GameRoomController {
             return ResponseEntity.badRequest().body(
                 ApiResponse.error(400, "Invalid parameters: " + e.getMessage())
             );
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.error("Error creating room", e);
             return ResponseEntity.internalServerError().body(
                 ApiResponse.error(500, "Error creating room: " + e.getMessage())

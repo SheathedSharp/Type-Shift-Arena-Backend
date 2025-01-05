@@ -1,8 +1,8 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-14 17:00:29
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-15 19:31:21
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2025-01-04 12:11:06
  */
 package com.example.demo.service.game;
 
@@ -22,8 +22,6 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Timer;
-import java.util.TimerTask;
 
 @Service
 public class MatchmakingService {

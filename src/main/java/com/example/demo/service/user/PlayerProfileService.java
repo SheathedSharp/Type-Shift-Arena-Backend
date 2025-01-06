@@ -20,7 +20,7 @@ public class PlayerProfileService {
     private RankingService rankingService;
     
     // 更新玩家数据
-    public PlayerProfile updatePlayerStats(Long id, double wpm, double accuracy, 
+    public PlayerProfile updatePlayerStats(String id, double wpm, double accuracy, 
                                          boolean isVictory, boolean isRanked) {
         PlayerProfile profile = getPlayerProfileById(id);
         if (profile == null) {
@@ -125,7 +125,7 @@ public class PlayerProfileService {
         profile.setUserLevel(newLevel);
     }
     
-    public PlayerProfile getPlayerProfileById(Long id) {
+    public PlayerProfile getPlayerProfileById(String id) {
         return playerProfileRepository.findById(id).orElse(null);
     }
 }

@@ -2,12 +2,6 @@
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-11-30 00:17:44
  */
-/*
- * @Author: hiddenSharp429 z404878860@163.com
- * @Date: 2024-10-29 22:46:23
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-12-30 14:09:02
- */
 package com.example.demo.service.game;
 
 import java.util.List;
@@ -27,9 +21,6 @@ import com.example.demo.model.game.GameMessage;
 import com.example.demo.model.game.GameRoom;
 import com.example.demo.model.game.GameStatus;
 import com.example.demo.service.user.UserService;
-
-import com.example.demo.service.user.UserService;
-import com.example.demo.entity.User;
 
 @Service
 public class GameRoomService {
@@ -105,7 +96,7 @@ public class GameRoomService {
             message.setPlayerId(otherPlayerId);
             message.setPlayerName(otherPlayerName);
             String avatar = !otherPlayerId.isEmpty() ? 
-                userService.getUserById(Long.parseLong(otherPlayerId))
+                userService.getUserById(otherPlayerId)
                         .map(User::getImgSrc)
                         .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + otherPlayerName) 
                 : "";  // 使用空字符串替代null
@@ -153,7 +144,7 @@ public class GameRoomService {
                     message.setPlayerId(otherPlayerId);
                     message.setPlayerName(otherPlayerName);
                     String avatar = !otherPlayerId.isEmpty() ? 
-                        userService.getUserById(Long.parseLong(otherPlayerId))
+                        userService.getUserById(otherPlayerId)
                                 .map(User::getImgSrc)
                                 .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + otherPlayerName) 
                         : "";  // 使用空字符串替代null
@@ -253,7 +244,7 @@ public class GameRoomService {
                 
         // 获取对手头像
         String opponentAvatar = !opponentId.isEmpty() ? 
-            userService.getUserById(Long.parseLong(opponentId))
+            userService.getUserById(opponentId)
                     .map(User::getImgSrc)
                     .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + opponentName) 
             : "";  // 使用空字符串替代null
@@ -283,7 +274,7 @@ public class GameRoomService {
         roomInfo.setPlayerName(requestPlayerName);
         
         // 获取请求玩家的头像
-        String playerAvatar = userService.getUserById(Long.parseLong(requestPlayerId))
+        String playerAvatar = userService.getUserById(requestPlayerId)
                 .map(User::getImgSrc)
                 .orElse("https://api.dicebear.com/7.x/avataaars/svg?seed=" + requestPlayerName);
         roomInfo.setPlayerAvatar(playerAvatar);

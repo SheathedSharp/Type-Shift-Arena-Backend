@@ -1,8 +1,6 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-28 20:03:44
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-12-30 19:12:01
  */
 package com.example.demo.controller.game;
 
@@ -16,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import com.example.demo.model.dto.game.GameMatchDTO;
 import com.example.demo.model.game.GameMessage;
 import com.example.demo.model.game.GameProgress;
+import com.example.demo.service.game.GameInviteService;
 import com.example.demo.service.game.GameMatchService;
 import com.example.demo.service.game.GameService;
 
@@ -33,6 +32,9 @@ public class GameController {
 
     @Autowired
     private GameMatchService gameMatchService; // 比赛服务
+
+    @Autowired
+    private GameInviteService gameInviteService; // 游戏邀请服务
 
     /* 
         映射注解说明
@@ -70,5 +72,17 @@ public class GameController {
     public void recordMatch(@DestinationVariable String roomId, GameMatchDTO matchDTO) {
         logger.info("Recording match result for room {}", roomId);
         gameMatchService.recordMatch(matchDTO);
+    }
+
+    // 发送游戏邀请
+    @MessageMapping("/game/invite")
+    public void sendGameInvite(GameMessage message) {
+        logger.info("Game invite sent from {} to {}", message.getPlayerId(), message.getOpponentId());
+        
+        gameInviteService.sendGameInvite(
+            message.getPlayerId(),
+            message.getOpponentId(),
+            message.getRoomId()
+        );
     }
 }

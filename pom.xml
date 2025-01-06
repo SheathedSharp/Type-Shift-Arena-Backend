@@ -77,14 +77,12 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.version}</version>
-			<optional>true</optional> 
 		</dependency>
 
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-common</artifactId>
 			<version>${springdoc.version}</version>
-			<optional>true</optional>
 		</dependency>
 
 		<!-- Spring Boot Starter WebSocket -->
@@ -140,19 +138,17 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Springdoc OpenAPI -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-common</artifactId>
-			<version>${springdoc.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- H2 Database for Testing -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<!-- Redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -180,14 +176,14 @@
 							<groupId>de.vandermeer</groupId>
 							<artifactId>asciitable</artifactId>
 						</exclude>
-						<exclude>
+						<!-- <exclude>
 							<groupId>org.springdoc</groupId>
 							<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 						</exclude>
 						<exclude>
 							<groupId>org.springdoc</groupId>
 							<artifactId>springdoc-openapi-starter-common</artifactId>
-						</exclude>
+						</exclude> -->
 					</excludes>
 					<!-- 启用瘦身打包 -->
 					<excludeDevtools>true</excludeDevtools>

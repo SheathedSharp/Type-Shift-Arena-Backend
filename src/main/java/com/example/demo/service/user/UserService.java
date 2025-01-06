@@ -1,28 +1,25 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 15:39:23
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-10 10:41:52
  */
 package com.example.demo.service.user;
 
-import com.example.demo.controller.user.UserController;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.entity.PlayerProfile;
 import com.example.demo.entity.User;
 import com.example.demo.exception.InvalidPasswordException;
 import com.example.demo.exception.PasswordMismatchException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.dto.UpdatePasswordDTO;
 import com.example.demo.model.dto.UpdateUserDTO;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.entity.PlayerProfile;
 import com.example.demo.repository.PlayerProfileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-
-import java.util.List;
-import java.util.Optional;
+import com.example.demo.repository.UserRepository;
 
 
 @Service
@@ -40,7 +37,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> getUserById(String id) {
         return userRepository.findById(id);
     }
 
@@ -63,7 +60,7 @@ public class UserService {
         return savedUser;
     }
 
-    public void deleteUser(Long id) {
+    public void deleteUser(String id) {
         userRepository.deleteById(id);
     }
 
@@ -76,7 +73,7 @@ public class UserService {
     }
 
     // 更新用户基础信息（用户名、邮箱、头像url）
-    public User updateUserById(Long id, UpdateUserDTO updateUserDTO) {
+    public User updateUserById(String id, UpdateUserDTO updateUserDTO) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
@@ -90,7 +87,7 @@ public class UserService {
     }
 
     // 更新用户密码
-    public void updatePassword(Long id, UpdatePasswordDTO updatePasswordDTO) {
+    public void updatePassword(String id, UpdatePasswordDTO updatePasswordDTO) {
         Optional<User> optionalUser = userRepository.findById(id);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();

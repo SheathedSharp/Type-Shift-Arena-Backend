@@ -1,26 +1,33 @@
 /*
  * @Author: hiddenSharp429 z404878860@163.com
  * @Date: 2024-10-27 18:20:34
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-14 22:21:56
  */
 package com.example.demo.controller.user;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.core.ApiResponse;
 import com.example.demo.entity.User;
 import com.example.demo.model.dto.UpdatePasswordDTO;
 import com.example.demo.model.dto.UpdateUserDTO;
 import com.example.demo.model.dto.UserCreateDTO;
 import com.example.demo.model.dto.UserDTO;
 import com.example.demo.service.user.UserService;
-import com.example.demo.core.ApiResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,7 +44,7 @@ public class UserController {
     @Operation(summary = "Get a user by ID", description = "Returns a user as per the id")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getUserById(
-            @Parameter(description = "ID of user to be searched") @PathVariable Long id) {
+            @Parameter(description = "ID of user to be searched") @PathVariable String id) {
         return userService.getUserById(id)
                 .map(user -> ResponseEntity.ok(ApiResponse.success("User found successfully", new UserDTO(user))))
                 .orElse(ResponseEntity.notFound().build());
@@ -71,7 +78,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO) {
+    public ResponseEntity<User> updateUser(@PathVariable String id, @RequestBody UpdateUserDTO updateUserDTO) {
         User updatedUser = userService.updateUserById(id, updateUserDTO);
 
         return ResponseEntity.ok(updatedUser);
@@ -79,7 +86,7 @@ public class UserController {
 
     @Operation(summary = "Update a user's password", description = "Updates a user's password ")
     @PutMapping("/{id}/password")
-    public ResponseEntity<String> updatePassword(@PathVariable Long id, @RequestBody UpdatePasswordDTO updatePasswordDTO)
+    public ResponseEntity<String> updatePassword(@PathVariable String id, @RequestBody UpdatePasswordDTO updatePasswordDTO)
     {
         // 调用服务层方法，尝试更新密码
         userService.updatePassword(id, updatePasswordDTO);
@@ -89,7 +96,7 @@ public class UserController {
 
     @Operation(summary = "Delete a user", description = "Deletes a user by ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
         return userService.getUserById(id)
                 .map(user -> {
                     userService.deleteUser(id);

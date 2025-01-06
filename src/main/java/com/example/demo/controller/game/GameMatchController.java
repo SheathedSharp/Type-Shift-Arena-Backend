@@ -34,7 +34,7 @@ public class GameMatchController {
               description = "Returns all matches of a player")
     @GetMapping("/player/{playerId}")
     public ResponseEntity<ApiResponse<List<GameMatch>>> getPlayerMatches(
-            @PathVariable Long playerId,
+            @PathVariable String playerId,
             @RequestParam(required = false) Boolean ranked) {
         try {
             List<GameMatch> matches;

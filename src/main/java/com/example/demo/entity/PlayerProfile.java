@@ -22,7 +22,7 @@ import lombok.Setter;
 @Setter
 public class PlayerProfile {
     @Id
-    private Long id;
+    private String id;
 
     @OneToOne
     @MapsId

@@ -71,23 +71,6 @@ public class MessageService {
         }
     }
 
-    // 发送游戏邀请
-    public Message sendGameInvite(String senderId, String receiverId, String roomId) {
-        Message message = new Message();
-        message.setSenderId(senderId);
-        message.setReceiverId(receiverId);
-        message.setType(MessageType.GAME_INVITE);
-        message.setStatus(MessageStatus.UNREAD);
-        message.setContent(roomId);
-        
-        Message savedMessage = messageRepository.save(message);
-        
-        // 通过WebSocket通知接收者
-        notifyUser(receiverId, MessageType.GAME_INVITE, savedMessage);
-        
-        return savedMessage;
-    }
-
     // 获取用户未读消息
     public List<MessageDTO> getUnreadMessages(String userId) {
         try {

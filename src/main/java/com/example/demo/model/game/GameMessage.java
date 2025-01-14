@@ -1,7 +1,7 @@
 /*
- * @Author: hiddenSharp429 z404878860@163.com
+ * @Author: SheathedSharp z404878860@163.com
  * @Date: 2024-11-06 18:19:04
- * @LastEditors: hiddenSharp429 z404878860@163.com
+ * @LastEditors: SheathedSharp z404878860@163.com
  * @LastEditTime: 2024-11-15 21:39:22
  */
 package com.example.demo.model.game;

@@ -1,8 +1,6 @@
 <!--
- * @Author: hiddenSharp429 z404878860@163.com
- * @Date: 2024-10-27 17:59:31
- * @LastEditors: hiddenSharp429 z404878860@163.com
- * @LastEditTime: 2024-11-11 20:06:25
+ * @Author: SheathedSharp z404878860@163.com
+ * @Date: 2024-11-30 00:17:44
 -->
 <div align="center">
   
@@ -42,9 +40,30 @@
 
 </div>
 
-This is a backend project for Type Shi(f)t Arena. It is a simple project that uses Spring Boot and Spring Data JPA to manage a MySQL database.
+Type Shi(f)t Arena is an engaging, competitive typing platform combining real-time gameplay with fun mechanics. It includes both a frontend built with Vue.js and a backend powered by Spring Boot, offering a seamless, robust user experience for typing enthusiasts.**This repo is the backend part of the project.** frontend repo is
+[here](https://github.com/SheathedSharp/Type-Shift-Arena-Frontend)
 
-## Adding Environment Variables
+## 🎮 Key Features (Backend)
+- **Game Management**: Real-time game rooms, difficulty management, and category-based game content.
+- **Authentication & User System**: Secure JWT-based authentication, player profiles, friends, performance tracking, and ranking systems.
+- **WebSocket Integration**: Real-time updates and game state synchronization for multiplayer sessions.
+- **Scalable Architecture**: Follows Domain-Driven Design (DDD) with a clean, layered structure, supporting future expansions.
+- **Performance Optimization**: Redis caching for fast responses, ensuring stability in high-concurrency environments.
+
+## 🛠️ Technical Stack (Backend)
+- **Framework**: Spring Boot 3.2.3
+- **Database**: MySQL, Redis
+- **Security**: JWT, Spring Security
+- **Real-Time Communication**: Spring WebSocket
+- **Build Tool**: Maven
+
+## 🌐 API & Documentation
+The backend includes extensive API documentation using Swagger UI, making integration and testing straightforward for frontend developers. It supports CORS, secure JWT-based authentication, and detailed logging.
+
+**Note**: Postman is not supported, please use Swagger UI for API testing.
+
+## How to use
+### 1. Adding Environment Variables
 In the development environment, database and JWT configurations use environment variables to prevent privacy leaks.
 
 The specific code is as follows:
@@ -88,16 +107,7 @@ export JWT_EXPIRATION=your_desired_expiration_time (optional)
 3. Save and exit the file
 4. Reload configuration with source ~/.zshrc
 
-## DEPENDENCIES
-- Spring Boot 3.2.3
-- Maven 3.9.9
-- MySQL 9.0.1
-- JDK 17
-- JWT
-- Spring Security
-- Spring WebSocket
-
-## Database Setup
+### 2. Database Setup
 
 To initialize the database, follow these steps:
 
@@ -112,7 +122,7 @@ To initialize the database, follow these steps:
 
 4. Update the `application-dev.properties` and `application-prod.properties` files with your database credentials.
 
-## Running the Application
+### 3. Running the Application
 
 To run the application, use the following command. (Default is development environment)
 
@@ -128,7 +138,7 @@ mvn spring-boot:run -Dspring.profiles.active=prod
 
 visit http://localhost:9090/hello to see the result.
 
-## API Documentation AND TEST
+### 4. API Documentation AND TEST
 visit http://localhost:9090/swagger-ui.html to see the API documentation and test the API.
 
 waring: some API may not work because of the security configuration.

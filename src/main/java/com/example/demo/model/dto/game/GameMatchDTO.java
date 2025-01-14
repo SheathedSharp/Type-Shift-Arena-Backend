@@ -1,5 +1,5 @@
 /*
- * @Author: hiddenSharp429 z404878860@163.com
+ * @Author: SheathedSharp z404878860@163.com
  * @Date: 2024-12-30 18:55:04
  */
 package com.example.demo.model.dto.game;

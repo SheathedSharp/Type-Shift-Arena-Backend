@@ -1,8 +1,6 @@
 <!--
  * @Author: SheathedSharp z404878860@163.com
  * @Date: 2024-10-27 17:59:31
- * @LastEditors: SheathedSharp z404878860@163.com
- * @LastEditTime: 2024-11-11 20:06:30
 -->
 <div align="center">
   
@@ -40,9 +38,28 @@
 
 </div>
 
-这是 Type Shi(f)t Arena 的后端项目。该项目使用 Spring Boot 和 Spring Data JPA 来管理 MySQL 数据库。
+Type Shi(f)t Arena 是一个小型又友好的竞技打字项目，将实时游戏玩法与有趣的机制相结合。它包括使用 Vue.js 构建的前端和由 Spring Boot 驱动的后端，填充当前WEB网页市面上好的练习打字平台的空缺，为好友友好切磋，或爱好者提供无缝、强大的用户体验。**本仓库是项目的后端部分。** 前端仓库在[这里](https://github.com/SheathedSharp/Type-Shift-Arena-Frontend)
 
-## 添加环境变量
+## 🎮 主要特性（后端）
+- **游戏管理**：实时游戏房间、难度管理和基于类别的游戏内容。
+- **认证和用户系统**：安全的JWT认证、玩家档案、好友系统、性能追踪和排名系统。
+- **WebSocket集成**：多人会话的实时更新和游戏状态同步。
+- **可扩展架构**：遵循领域驱动设计（DDD）的清晰分层结构，支持未来扩展。
+- **性能优化**：使用Redis缓存实现快速响应，确保高并发环境下的稳定性。
+
+## 🛠️ 技术栈（后端）
+- **框架**：Spring Boot 3.2.3
+- **数据库**：MySQL, Redis
+- **安全**：JWT, Spring Security
+- **实时通信**：Spring WebSocket
+- **构建工具**：Maven
+
+## 🌐 API和文档
+后端使用Swagger UI提供全面的API文档，使前端开发人员能够轻松进行集成和测试。支持CORS、安全的JWT认证和详细的日志记录。
+
+## 怎么部署使用
+
+### 1. 添加环境变量
 在开发环境中有关数据库和JWT的配置均使用环境变量的方法进行配置，以防隐私泄露
 
 具体的代码如下：
@@ -83,16 +100,7 @@ export JWT_EXPIRATION=你期望到期的时间（非必要）
 3. 保存文件并退出
 4. 重新加载配置`source ~/.zshrc`
 
-## 依赖
-- Spring Boot 3.2.3
-- Maven 3.9.9
-- MySQL 9.0.1
-- JDK 17
-- JWT
-- Spring Security
-- Spring WebSocket
-
-## 数据库设置
+### 2. 数据库设置
 
 要初始化数据库，请按照以下步骤操作：
 
@@ -107,7 +115,7 @@ export JWT_EXPIRATION=你期望到期的时间（非必要）
 
 4. 使用您的数据库凭据更新 `application-dev.properties` 和 `application-prod.properties` 文件。
 
-## 运行应用
+### 3. 运行应用
 
 使用以下命令来选择运行环境。（默认是开发环境）
 
@@ -123,7 +131,7 @@ mvn spring-boot:run -Dspring.profiles.active=prod
 
 访问 http://localhost:9090/hello 查看结果。
 
-## API 文档和测试
+### 4. API 文档和测试
 访问 http://localhost:9090/swagger-ui.html 查看 API 文档并测试 API。
 
 警告：由于安全配置，某些 API 可能无法使用。

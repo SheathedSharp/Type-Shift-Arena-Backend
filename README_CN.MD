@@ -124,6 +124,11 @@ export JWT_EXPIRATION=你期望到期的时间（非必要）
 mvn spring-boot:run
 ```
 
+随后启动reids服务
+```bash
+brew services start redis
+```
+
 生产环境：
 ```bash
 mvn spring-boot:run -Dspring.profiles.active=prod

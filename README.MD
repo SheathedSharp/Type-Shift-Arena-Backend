@@ -130,6 +130,10 @@ for development:
 ```bash
 mvn spring-boot:run
 ```
+then start redis server:
+```bash
+brew services start redis
+```
 
 for production:
 ```bash

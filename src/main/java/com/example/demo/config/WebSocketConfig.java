@@ -53,13 +53,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-            .setAllowedOrigins(allowedOrigins.split(","))
-            .withSockJS()
-            .setWebSocketEnabled(true)
-            .setDisconnectDelay(30 * 1000);
-            
-        // 同时添加一个不使用 SockJS 的端点，用于直接的 WebSocket 连接
-        registry.addEndpoint("/ws")
             .setAllowedOrigins(allowedOrigins.split(","));
             
         logger.info("WebSocket endpoint registered with allowed origins: {}", allowedOrigins);

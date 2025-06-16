@@ -52,8 +52,8 @@
 
 		<!-- MySQL Driver -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
 			<version>8.0.33</version>
 			<scope>runtime</scope>
 		</dependency>
@@ -156,6 +156,13 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dashscope-sdk-java</artifactId>
+			<!-- 请将 'the-latest-version' 替换为最新版本号：https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+			<version>2.20.3</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -193,7 +200,6 @@
 					</excludes>
 					<!-- 启用瘦身打包 -->
 					<excludeDevtools>true</excludeDevtools>
-					<minimizeJar>true</minimizeJar>
 				</configuration>
 			</plugin>
 		</plugins>

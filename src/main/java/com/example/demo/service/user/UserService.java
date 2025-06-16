@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.entity.PlayerProfile;
 import com.example.demo.entity.User;
@@ -45,6 +46,7 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    @Transactional
     public User saveUser(User user) {
         // 加密密码
         user.setPassword(passwordEncoder.encode(user.getPassword()));

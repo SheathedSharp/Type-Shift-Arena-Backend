@@ -14,6 +14,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
@@ -31,6 +33,7 @@ import lombok.Setter;
 @Setter
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 36)
     private String id;
 
@@ -47,7 +50,7 @@ public class User {
     private String imgSrc = "https://api.dicebear.com/7.x/avataaars/svg?seed=";  // 使用 DiceBear API 生成默认头像
 
     @Column(nullable = false)
-    private String role;
+    private String role = "user";
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -69,9 +72,6 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
-        if (id == null) {
-            id = UUID.randomUUID().toString();
-        }
         createdAt = LocalDateTime.now();
         // 设置随机默认头像
         if (imgSrc.equals("https://api.dicebear.com/7.x/avataaars/svg?seed=")) {

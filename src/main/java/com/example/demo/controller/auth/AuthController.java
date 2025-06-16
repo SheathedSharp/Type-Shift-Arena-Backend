@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -68,9 +69,14 @@ public class AuthController {
 
     @Operation(summary = "Register", description = "Registers a new user")
     @PostMapping("/register")
+    @Transactional
     public ResponseEntity<?> register(@RequestBody User user) {
         if (userService.existsByUsername(user.getUsername())) {
             return ResponseEntity.badRequest().body("Username already exists");
+        }
+
+        if (userService.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already exists");
         }
 
         User savedUser = userService.saveUser(user);

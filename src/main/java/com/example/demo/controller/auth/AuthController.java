@@ -61,6 +61,7 @@ public class AuthController {
         Optional<User> user = userService.getUserByUsername(userDetails.getUsername());
         response.put("imgSrc", user.get().getImgSrc());
         response.put("userId", user.get().getId());
+        response.put("role", user.get().getRole());
 
         return ResponseEntity.ok(response);
     }

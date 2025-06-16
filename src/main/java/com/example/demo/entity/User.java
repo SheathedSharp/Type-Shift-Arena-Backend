@@ -46,6 +46,9 @@ public class User {
     @Column(name = "imgSrc")  
     private String imgSrc = "https://api.dicebear.com/7.x/avataaars/svg?seed=";  // 使用 DiceBear API 生成默认头像
 
+    @Column(nullable = false)
+    private String role;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

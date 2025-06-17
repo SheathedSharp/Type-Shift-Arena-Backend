@@ -26,8 +26,11 @@ public class GameConfigController {
     // =========================== 游戏模式API ===========================
     
     @GetMapping("/modes")
-    public ResponseEntity<List<GameMode>> getAllModes() {
-        List<GameMode> modes = gameConfigService.getAllActiveModes();
+    public ResponseEntity<List<GameMode>> getAllModes(
+            @RequestParam(value = "includeInactive", defaultValue = "false") boolean includeInactive) {
+        List<GameMode> modes = includeInactive ? 
+            gameConfigService.getAllModes() : 
+            gameConfigService.getAllActiveModes();
         return ResponseEntity.ok(modes);
     }
     
@@ -59,8 +62,11 @@ public class GameConfigController {
     // =========================== 游戏语言API ===========================
     
     @GetMapping("/languages")
-    public ResponseEntity<List<GameLanguage>> getAllLanguages() {
-        List<GameLanguage> languages = gameConfigService.getAllActiveLanguages();
+    public ResponseEntity<List<GameLanguage>> getAllLanguages(
+            @RequestParam(value = "includeInactive", defaultValue = "false") boolean includeInactive) {
+        List<GameLanguage> languages = includeInactive ? 
+            gameConfigService.getAllLanguages() : 
+            gameConfigService.getAllActiveLanguages();
         return ResponseEntity.ok(languages);
     }
     
@@ -98,8 +104,11 @@ public class GameConfigController {
     // =========================== 游戏类型API ===========================
     
     @GetMapping("/categories")
-    public ResponseEntity<List<GameCategory>> getAllCategories() {
-        List<GameCategory> categories = gameConfigService.getAllActiveCategories();
+    public ResponseEntity<List<GameCategory>> getAllCategories(
+            @RequestParam(value = "includeInactive", defaultValue = "false") boolean includeInactive) {
+        List<GameCategory> categories = includeInactive ? 
+            gameConfigService.getAllCategories() : 
+            gameConfigService.getAllActiveCategories();
         return ResponseEntity.ok(categories);
     }
     
@@ -131,8 +140,11 @@ public class GameConfigController {
     // =========================== 游戏难度API ===========================
     
     @GetMapping("/difficulties")
-    public ResponseEntity<List<GameDifficulty>> getAllDifficulties() {
-        List<GameDifficulty> difficulties = gameConfigService.getAllActiveDifficulties();
+    public ResponseEntity<List<GameDifficulty>> getAllDifficulties(
+            @RequestParam(value = "includeInactive", defaultValue = "false") boolean includeInactive) {
+        List<GameDifficulty> difficulties = includeInactive ? 
+            gameConfigService.getAllDifficulties() : 
+            gameConfigService.getAllActiveDifficulties();
         return ResponseEntity.ok(difficulties);
     }
     

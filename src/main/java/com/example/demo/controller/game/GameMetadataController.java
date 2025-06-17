@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.enums.TextCategory;
 import com.example.demo.entity.enums.TextLanguage;
-import com.example.demo.model.dto.game.GameCategoryDTO;
-import com.example.demo.model.dto.game.GameLanguageDTO;
+import com.example.demo.model.dto.config.GameCategoryDTO;
+import com.example.demo.model.dto.config.GameLanguageDTO;
 import com.example.demo.model.dto.game.GameTextMetadataDTO;
 import com.example.demo.service.game.GameTextService;
 
@@ -33,45 +33,45 @@ public class GameMetadataController {
     @Autowired
     private GameTextService gameTextService;
 
-    @Operation(summary = "Get all supported languages", 
-              description = "Returns a list of all supported languages with their availability status")
-    @GetMapping("/languages")
-    public ResponseEntity<List<GameLanguageDTO>> getAllLanguages() {
-        List<GameLanguageDTO> languages = Arrays.stream(TextLanguage.values())
-            .map(lang -> new GameLanguageDTO(
-                lang.getCode(),
-                lang.name(),
-                lang.getDisplayName(),
-                gameTextService.hasTextsForLanguage(lang)
-            ))
-            .collect(Collectors.toList());
+    // @Operation(summary = "Get all supported languages", 
+    //           description = "Returns a list of all supported languages with their availability status")
+    // @GetMapping("/languages")
+    // public ResponseEntity<List<GameLanguageDTO>> getAllLanguages() {
+    //     List<GameLanguageDTO> languages = Arrays.stream(TextLanguage.values())
+    //         .map(lang -> new GameLanguageDTO(
+    //             lang.getCode(),
+    //             lang.name(),
+    //             lang.getDisplayName(),
+    //             gameTextService.hasTextsForLanguage(lang)
+    //         ))
+    //         .collect(Collectors.toList());
         
-        return ResponseEntity.ok(languages);
-    }
+    //     return ResponseEntity.ok(languages);
+    // }
 
-    @Operation(summary = "Get available languages", 
-              description = "Returns a list of languages that have available game texts")
-    @GetMapping("/languages/available")
-    public ResponseEntity<List<GameLanguageDTO>> getAvailableLanguages() {
-        List<GameLanguageDTO> availableLanguages = Arrays.stream(TextLanguage.values())
-            .filter(lang -> gameTextService.hasTextsForLanguage(lang))
-            .map(lang -> new GameLanguageDTO(
-                lang.getCode(),
-                lang.name(),
-                lang.getDisplayName(),
-                true
-            ))
-            .collect(Collectors.toList());
+    // @Operation(summary = "Get available languages", 
+    //           description = "Returns a list of languages that have available game texts")
+    // @GetMapping("/languages/available")
+    // public ResponseEntity<List<GameLanguageDTO>> getAvailableLanguages() {
+    //     List<GameLanguageDTO> availableLanguages = Arrays.stream(TextLanguage.values())
+    //         .filter(lang -> gameTextService.hasTextsForLanguage(lang))
+    //         .map(lang -> new GameLanguageDTO(
+    //             lang.getCode(),
+    //             lang.name(),
+    //             lang.getDisplayName(),
+    //             true
+    //         ))
+    //         .collect(Collectors.toList());
         
-        return ResponseEntity.ok(availableLanguages);
-    }
+    //     return ResponseEntity.ok(availableLanguages);
+    // }
 
-    @Operation(summary = "Get available categories by language")
-    @GetMapping("/categories/{language}")
-    public ResponseEntity<List<GameCategoryDTO>> getCategoriesByLanguage(
-            @PathVariable TextLanguage language) {
-        return ResponseEntity.ok(gameTextService.getAvailableCategoriesByLanguage(language));
-    }
+    // @Operation(summary = "Get available categories by language")
+    // @GetMapping("/categories/{language}")
+    // public ResponseEntity<List<GameCategoryDTO>> getCategoriesByLanguage(
+    //         @PathVariable TextLanguage language) {
+    //     return ResponseEntity.ok(gameTextService.getAvailableCategoriesByLanguage(language));
+    // }
 
     @Operation(summary = "Get available difficulties by language and category")
     @GetMapping("/difficulties/{language}/{category}")

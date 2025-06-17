@@ -28,6 +28,10 @@ public interface GameDifficultyRepository extends JpaRepository<GameDifficulty, 
     @Query("SELECT gd FROM GameDifficulty gd WHERE gd.isActive = true ORDER BY gd.sortOrder, gd.displayName")
     List<GameDifficulty> findAllActiveOrderBySortOrder();
     
+    // 查找所有难度（包括禁用的），按排序顺序
+    @Query("SELECT gd FROM GameDifficulty gd ORDER BY gd.sortOrder, gd.displayName")
+    List<GameDifficulty> findAllByOrderBySortOrder();
+    
     // 根据激活状态查找
     List<GameDifficulty> findByIsActiveOrderByLevelValue(Boolean isActive);
     

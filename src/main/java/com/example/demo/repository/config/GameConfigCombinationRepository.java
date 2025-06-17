@@ -21,6 +21,10 @@ public interface GameConfigCombinationRepository extends JpaRepository<GameConfi
     @Query("SELECT gcc FROM GameConfigCombination gcc WHERE gcc.isActive = true")
     List<GameConfigCombination> findAllActive();
     
+    // 查找所有配置组合（包括非激活的）
+    @Query("SELECT gcc FROM GameConfigCombination gcc")
+    List<GameConfigCombination> findAll();
+    
     // 根据模式查找配置组合
     @Query("SELECT gcc FROM GameConfigCombination gcc " +
            "WHERE gcc.gameMode.name = :modeName AND gcc.isActive = true")

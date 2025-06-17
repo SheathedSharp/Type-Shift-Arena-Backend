@@ -17,7 +17,7 @@ import com.example.demo.entity.GameText;
 import com.example.demo.entity.enums.TextCategory;
 import com.example.demo.entity.enums.TextLanguage;
 import com.example.demo.model.dto.CustomGameTextDTO;
-import com.example.demo.model.dto.game.GameCategoryDTO;
+import com.example.demo.model.dto.config.GameCategoryDTO;
 import com.example.demo.model.dto.game.GameTextMetadataDTO;
 import com.example.demo.repository.GameTextRepository;
 
@@ -88,17 +88,17 @@ public class GameTextService {
         return gameTextRepository.existsByCategory(category);
     }
 
-    @Cacheable(value = "categories", key = "#language")
-    public List<GameCategoryDTO> getAvailableCategoriesByLanguage(TextLanguage language) {
-        return Arrays.stream(TextCategory.values())
-            .filter(category -> gameTextRepository.existsByLanguageAndCategory(language, category))
-            .map(category -> new GameCategoryDTO(
-                category.name(),
-                category.getDescription(),
-                true
-            ))
-            .collect(Collectors.toList());
-    }
+    // @Cacheable(value = "categories", key = "#language")
+    // public List<GameCategoryDTO> getAvailableCategoriesByLanguage(TextLanguage language) {
+    //     return Arrays.stream(TextCategory.values())
+    //         .filter(category -> gameTextRepository.existsByLanguageAndCategory(language, category))
+    //         .map(category -> new GameCategoryDTO(
+    //             category.name(),
+    //             category.getDescription(),
+    //             true
+    //         ))
+    //         .collect(Collectors.toList());
+    // }
 
     @Cacheable(value = "difficulties", key = "#language + '-' + #category")
     public List<String> getAvailableDifficulties(TextLanguage language, TextCategory category) {

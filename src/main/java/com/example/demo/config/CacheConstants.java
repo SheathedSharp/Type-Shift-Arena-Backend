@@ -23,10 +23,15 @@ public class CacheConstants {
     
     // 列表缓存键
     public static final String ALL_MODES = "all_modes";
+    public static final String ALL_MODES_ACTIVE = "all_modes_active";
     public static final String ALL_LANGUAGES = "all_languages";
+    public static final String ALL_LANGUAGES_ACTIVE = "all_languages_active";
     public static final String ALL_CATEGORIES = "all_categories";
+    public static final String ALL_CATEGORIES_ACTIVE = "all_categories_active";
     public static final String ALL_DIFFICULTIES = "all_difficulties";
+    public static final String ALL_DIFFICULTIES_ACTIVE = "all_difficulties_active";
     public static final String ALL_COMBINATIONS = "all_combinations";
+    public static final String ALL_COMBINATIONS_ACTIVE = "all_combinations_active";
     
     // 关系查询缓存键模板
     public static final String LANGUAGES_BY_MODE = "languages_by_mode:";

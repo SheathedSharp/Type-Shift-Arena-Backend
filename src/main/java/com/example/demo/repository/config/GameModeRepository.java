@@ -24,6 +24,10 @@ public interface GameModeRepository extends JpaRepository<GameMode, String> {
     @Query("SELECT gm FROM GameMode gm WHERE gm.isActive = true ORDER BY gm.sortOrder, gm.displayName")
     List<GameMode> findAllActiveOrderBySortOrder();
     
+    // 查找所有模式（包括禁用的），按排序顺序
+    @Query("SELECT gm FROM GameMode gm ORDER BY gm.sortOrder, gm.displayName")
+    List<GameMode> findAllByOrderBySortOrder();
+    
     // 根据激活状态查找
     List<GameMode> findByIsActiveOrderBySortOrder(Boolean isActive);
     

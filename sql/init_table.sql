@@ -113,16 +113,24 @@ CREATE TABLE IF NOT EXISTS messages (
 -- 游戏模式表 (顶层)
 CREATE TABLE IF NOT EXISTS game_modes (
     id VARCHAR(36) PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE COMMENT '模式名称：如RANKED(排位赛), CASUAL(休闲赛), TUTORIAL(教程), CHALLENGE(挑战)',
-    display_name VARCHAR(100) NOT NULL COMMENT '显示名称：如排位赛, 休闲赛, 教程模式, 挑战模式',
+    name VARCHAR(50) NOT NULL UNIQUE COMMENT '模式名称：如CLASSIC, BUBBLE, IDIOMGUASS',
+    display_name VARCHAR(100) NOT NULL COMMENT '显示名称：如经典模式, 泡泡模式, 猜谜模式',
     description TEXT COMMENT '模式描述',
+    min_players INT NOT NULL DEFAULT 2 COMMENT '最小玩家数',
+    max_players INT NOT NULL DEFAULT 2 COMMENT '最大玩家数', 
+    default_max_players INT NOT NULL DEFAULT 2 COMMENT '默认最大玩家数',
+    player_options JSON COMMENT '可选人数选项（JSON数组格式）',
+    duration INT COMMENT '游戏持续盘数',
+    available_time_start TIME COMMENT '开放时间段-开始时间',
+    available_time_end TIME COMMENT '开放时间段-结束时间',
     is_active BOOLEAN NOT NULL DEFAULT TRUE COMMENT '是否激活',
     sort_order INT DEFAULT 0 COMMENT '排序顺序',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     INDEX idx_is_active (is_active),
-    INDEX idx_sort_order (sort_order)
+    INDEX idx_sort_order (sort_order),
+    INDEX idx_min_max_players (min_players, max_players)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='游戏模式配置表';
 
 -- 游戏语言表

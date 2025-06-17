@@ -5,6 +5,7 @@
 package com.example.demo.entity.config;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -26,13 +27,34 @@ public class GameMode {
     private String id;
 
     @Column(name = "name", nullable = false, unique = true, length = 50)
-    private String name; // RANKED, CASUAL, CUSTOM, TUTORIAL, CHALLENGE
+    private String name; // CLASSIC, BUBBLE, IDIOMGUESS
 
     @Column(name = "display_name", nullable = false, length = 100)
-    private String displayName; // 排位赛, 休闲赛, 自定义, 教程模式, 挑战模式
+    private String displayName; // 经典模式, 泡泡模式, 猜谜模式
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "min_players", nullable = false)
+    private Integer minPlayers = 2;
+
+    @Column(name = "max_players", nullable = false)
+    private Integer maxPlayers = 2;
+
+    @Column(name = "default_max_players", nullable = false)
+    private Integer defaultMaxPlayers = 2;
+
+    @Column(name = "player_options", columnDefinition = "JSON")
+    private String playerOptions; // 可选人数选项，JSON数组格式，如[2]或[2,4,6,8]
+
+    @Column(name = "duration")
+    private Integer duration; // 游戏持续盘数
+
+    @Column(name = "available_time_start")
+    private LocalTime availableTimeStart;
+
+    @Column(name = "available_time_end")
+    private LocalTime availableTimeEnd;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;

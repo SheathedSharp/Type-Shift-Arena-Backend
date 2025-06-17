@@ -27,6 +27,10 @@ public interface GameLanguageRepository extends JpaRepository<GameLanguage, Stri
     @Query("SELECT gl FROM GameLanguage gl WHERE gl.isActive = true ORDER BY gl.sortOrder, gl.displayName")
     List<GameLanguage> findAllActiveOrderBySortOrder();
     
+    // 查找所有语言（包括禁用的），按排序顺序
+    @Query("SELECT gl FROM GameLanguage gl ORDER BY gl.sortOrder, gl.displayName")
+    List<GameLanguage> findAllByOrderBySortOrder();
+    
     // 根据激活状态查找
     List<GameLanguage> findByIsActiveOrderBySortOrder(Boolean isActive);
     

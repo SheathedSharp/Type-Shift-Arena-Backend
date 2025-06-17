@@ -24,6 +24,10 @@ public interface GameCategoryRepository extends JpaRepository<GameCategory, Stri
     @Query("SELECT gc FROM GameCategory gc WHERE gc.isActive = true ORDER BY gc.sortOrder, gc.displayName")
     List<GameCategory> findAllActiveOrderBySortOrder();
     
+    // 查找所有类型（包括禁用的），按排序顺序
+    @Query("SELECT gc FROM GameCategory gc ORDER BY gc.sortOrder, gc.displayName")
+    List<GameCategory> findAllByOrderBySortOrder();
+    
     // 根据激活状态查找
     List<GameCategory> findByIsActiveOrderBySortOrder(Boolean isActive);
     

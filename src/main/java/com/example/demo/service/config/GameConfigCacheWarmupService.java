@@ -11,9 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.config.CacheConstants;
 import com.example.demo.entity.config.*;
+import com.example.demo.repository.config.*;
+import com.example.demo.repository.*;
 
 /**
  * 游戏配置缓存预热服务
@@ -26,6 +31,24 @@ public class GameConfigCacheWarmupService implements ApplicationRunner {
 
     @Autowired
     private GameConfigService gameConfigService;
+    
+    @Autowired
+    private CacheManager cacheManager;
+    
+    @Autowired
+    private GameModeRepository gameModeRepository;
+    
+    @Autowired
+    private GameLanguageRepository gameLanguageRepository;
+    
+    @Autowired
+    private GameCategoryRepository gameCategoryRepository;
+    
+    @Autowired
+    private GameDifficultyRepository gameDifficultyRepository;
+    
+    @Autowired
+    private GameConfigCombinationRepository gameConfigCombinationRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -39,9 +62,6 @@ public class GameConfigCacheWarmupService implements ApplicationRunner {
             
             // 预热层级关系查询
             warmupHierarchicalQueries();
-            
-            // 预热常用配置组合
-            warmupCommonCombinations();
             
             long endTime = System.currentTimeMillis();
             logger.info("游戏配置缓存预热完成，耗时: {}ms", endTime - startTime);
@@ -57,26 +77,45 @@ public class GameConfigCacheWarmupService implements ApplicationRunner {
     private void warmupBasicConfigs() {
         logger.info("预热基础配置列表...");
         
-        // 预热所有模式
-        List<GameMode> modes = gameConfigService.getAllActiveModes();
-        logger.info("预热游戏模式: {} 个", modes.size());
+        // 预热所有模式（包括非激活的）
+        List<GameMode> modes = gameConfigService.getAllModes();
+        logger.info("预热游戏模式（全量）: {} 个", modes.size());
         
-        // 预热所有语言
-        List<GameLanguage> languages = gameConfigService.getAllActiveLanguages();
-        logger.info("预热游戏语言: {} 个", languages.size());
+        // 预热激活的模式
+        List<GameMode> activeModes = gameConfigService.getAllActiveModes();
+        logger.info("预热游戏模式（激活）: {} 个", activeModes.size());
         
-        // 预热所有类型
-        List<GameCategory> categories = gameConfigService.getAllActiveCategories();
-        logger.info("预热游戏类型: {} 个", categories.size());
+        // 预热所有语言（包括非激活的）
+        List<GameLanguage> languages = gameConfigService.getAllLanguages();
+        logger.info("预热游戏语言（全量）: {} 个", languages.size());
         
-        // 预热所有难度
-        List<GameDifficulty> difficulties = gameConfigService.getAllActiveDifficulties();
-        logger.info("预热游戏难度: {} 个", difficulties.size());
+        // 预热激活的语言
+        List<GameLanguage> activeLanguages = gameConfigService.getAllActiveLanguages();
+        logger.info("预热游戏语言（激活）: {} 个", activeLanguages.size());
         
-        // 暂时跳过配置组合的预热，避免懒加载问题
-        // List<GameConfigCombination> combinations = gameConfigService.getAllActiveCombinations();
-        // logger.info("预热配置组合: {} 个", combinations.size());
-        logger.info("跳过配置组合预热（避免懒加载问题）");
+        // 预热所有类型（包括非激活的）
+        List<GameCategory> categories = gameConfigService.getAllCategories();
+        logger.info("预热游戏类型（全量）: {} 个", categories.size());
+        
+        // 预热激活的类型
+        List<GameCategory> activeCategories = gameConfigService.getAllActiveCategories();
+        logger.info("预热游戏类型（激活）: {} 个", activeCategories.size());
+        
+        // 预热所有难度（包括非激活的）
+        List<GameDifficulty> difficulties = gameConfigService.getAllDifficulties();
+        logger.info("预热游戏难度（全量）: {} 个", difficulties.size());
+        
+        // 预热激活的难度
+        List<GameDifficulty> activeDifficulties = gameConfigService.getAllActiveDifficulties();
+        logger.info("预热游戏难度（激活）: {} 个", activeDifficulties.size());
+        
+        // 预热所有配置组合（包括非激活的）
+        List<GameConfigCombination> combinations = gameConfigService.getAllCombinations();
+        logger.info("预热配置组合（全量）: {} 个", combinations.size());
+        
+        // 预热激活的配置组合
+        List<GameConfigCombination> activeCombinations = gameConfigService.getAllActiveCombinations();
+        logger.info("预热配置组合（激活）: {} 个", activeCombinations.size());
     }
 
     /**
@@ -85,9 +124,10 @@ public class GameConfigCacheWarmupService implements ApplicationRunner {
     private void warmupHierarchicalQueries() {
         logger.info("预热层级关系查询...");
         
-        List<GameMode> modes = gameConfigService.getAllActiveModes();
-        List<GameLanguage> languages = gameConfigService.getAllActiveLanguages();
-        List<GameCategory> categories = gameConfigService.getAllActiveCategories();
+        // 使用全量配置进行层级关系预热，确保覆盖所有可能的查询
+        List<GameMode> modes = gameConfigService.getAllModes();
+        List<GameLanguage> languages = gameConfigService.getAllLanguages();
+        List<GameCategory> categories = gameConfigService.getAllCategories();
         
         // 预热 模式 -> 语言 查询
         for (GameMode mode : modes) {
@@ -108,57 +148,126 @@ public class GameConfigCacheWarmupService implements ApplicationRunner {
     }
 
     /**
-     * 预热常用配置组合
-     */
-    private void warmupCommonCombinations() {
-        logger.info("预热常用配置组合...");
-        
-        // 预热一些常用的配置组合验证
-        String[] commonModes = {"RANKED", "CASUAL"};
-        String[] commonLanguages = {"CHINESE", "ENGLISH"};
-        String[] commonCategories = {"LITERATURE", "DAILY_CHAT"};
-        String[] commonDifficulties = {"EASY", "MEDIUM", "HARD"};
-        
-        int validationCount = 0;
-        for (String mode : commonModes) {
-            for (String language : commonLanguages) {
-                for (String category : commonCategories) {
-                    for (String difficulty : commonDifficulties) {
-                        gameConfigService.isConfigurationValid(mode, language, category, difficulty);
-                        validationCount++;
-                    }
-                }
-            }
-        }
-        
-        logger.info("预热配置验证: {} 个组合", validationCount);
-        
-        // 预热模式-语言组合查询
-        for (String mode : commonModes) {
-            for (String language : commonLanguages) {
-                gameConfigService.getCombinationsByModeAndLanguage(mode, language);
-            }
-        }
-        
-        // 预热语言-类型组合查询
-        for (String language : commonLanguages) {
-            for (String category : commonCategories) {
-                gameConfigService.getCombinationsByLanguageAndCategory(language, category);
-            }
-        }
-        
-        logger.info("常用配置组合预热完成");
-    }
-
-    /**
      * 手动触发缓存预热（可用于运行时刷新缓存）
      */
     public void manualWarmup() {
-        logger.info("手动触发缓存预热...");
+        logger.info("手动触发缓存预热（包括非激活配置）...");
+        
+        long startTime = System.currentTimeMillis();
+        
         try {
-            run(null);
+            // 直接操作缓存，避免AOP代理问题
+            manualWarmupBasicConfigs();
+            
+            // 预热层级关系查询  
+            warmupHierarchicalQueries();
+            
+            long endTime = System.currentTimeMillis();
+            logger.info("手动缓存预热完成，耗时: {}ms", endTime - startTime);
+            
         } catch (Exception e) {
             logger.error("手动缓存预热失败", e);
+            throw new RuntimeException("缓存预热失败", e);
         }
+    }
+    
+    /**
+     * 手动预热基础配置列表（直接操作缓存）
+     */
+    private void manualWarmupBasicConfigs() {
+        logger.info("手动预热基础配置列表...");
+        
+        Cache gameConfigListCache = cacheManager.getCache(CacheConstants.GAME_CONFIG_LIST);
+        if (gameConfigListCache == null) {
+            logger.error("缓存 {} 不存在，无法进行预热", CacheConstants.GAME_CONFIG_LIST);
+            throw new RuntimeException("缓存管理器未正确配置");
+        }
+        
+        // 游戏模式缓存预热
+        try {
+            List<GameMode> allModes = gameModeRepository.findAllByOrderBySortOrder();
+            List<GameMode> activeModes = gameModeRepository.findAllActiveOrderBySortOrder();
+            
+            gameConfigListCache.put(CacheConstants.ALL_MODES, allModes);
+            logger.info("成功设置全量游戏模式缓存: {} 个", allModes.size());
+            
+            gameConfigListCache.put(CacheConstants.ALL_MODES_ACTIVE, activeModes);
+            logger.info("成功设置激活游戏模式缓存: {} 个", activeModes.size());
+            
+            logger.info("游戏模式缓存预热完成: 全量 {} 个, 激活 {} 个", allModes.size(), activeModes.size());
+        } catch (Exception e) {
+            logger.error("游戏模式缓存预热失败", e);
+            throw new RuntimeException("游戏模式缓存预热失败", e);
+        }
+        
+        // 游戏语言缓存预热
+        try {
+            List<GameLanguage> allLanguages = gameLanguageRepository.findAllByOrderBySortOrder();
+            List<GameLanguage> activeLanguages = gameLanguageRepository.findAllActiveOrderBySortOrder();
+            
+            gameConfigListCache.put(CacheConstants.ALL_LANGUAGES, allLanguages);
+            logger.info("成功设置全量游戏语言缓存: {} 个", allLanguages.size());
+            
+            gameConfigListCache.put(CacheConstants.ALL_LANGUAGES_ACTIVE, activeLanguages);
+            logger.info("成功设置激活游戏语言缓存: {} 个", activeLanguages.size());
+            
+            logger.info("游戏语言缓存预热完成: 全量 {} 个, 激活 {} 个", allLanguages.size(), activeLanguages.size());
+        } catch (Exception e) {
+            logger.error("游戏语言缓存预热失败", e);
+            throw new RuntimeException("游戏语言缓存预热失败", e);
+        }
+        
+        // 游戏类型缓存预热
+        try {
+            List<GameCategory> allCategories = gameCategoryRepository.findAllByOrderBySortOrder();
+            List<GameCategory> activeCategories = gameCategoryRepository.findAllActiveOrderBySortOrder();
+            
+            gameConfigListCache.put(CacheConstants.ALL_CATEGORIES, allCategories);
+            logger.info("成功设置全量游戏类型缓存: {} 个", allCategories.size());
+            
+            gameConfigListCache.put(CacheConstants.ALL_CATEGORIES_ACTIVE, activeCategories);
+            logger.info("成功设置激活游戏类型缓存: {} 个", activeCategories.size());
+            
+            logger.info("游戏类型缓存预热完成: 全量 {} 个, 激活 {} 个", allCategories.size(), activeCategories.size());
+        } catch (Exception e) {
+            logger.error("游戏类型缓存预热失败", e);
+            throw new RuntimeException("游戏类型缓存预热失败", e);
+        }
+        
+        // 游戏难度缓存预热
+        try {
+            List<GameDifficulty> allDifficulties = gameDifficultyRepository.findAllByOrderBySortOrder();
+            List<GameDifficulty> activeDifficulties = gameDifficultyRepository.findAllActiveOrderByLevelValue();
+            
+            gameConfigListCache.put(CacheConstants.ALL_DIFFICULTIES, allDifficulties);
+            logger.info("成功设置全量游戏难度缓存: {} 个", allDifficulties.size());
+            
+            gameConfigListCache.put(CacheConstants.ALL_DIFFICULTIES_ACTIVE, activeDifficulties);
+            logger.info("成功设置激活游戏难度缓存: {} 个", activeDifficulties.size());
+            
+            logger.info("游戏难度缓存预热完成: 全量 {} 个, 激活 {} 个", allDifficulties.size(), activeDifficulties.size());
+        } catch (Exception e) {
+            logger.error("游戏难度缓存预热失败", e);
+            throw new RuntimeException("游戏难度缓存预热失败", e);
+        }
+        
+        // 配置组合缓存预热
+        try {
+            List<GameConfigCombination> allCombinations = gameConfigCombinationRepository.findAll();
+            List<GameConfigCombination> activeCombinations = gameConfigCombinationRepository.findAllActive();
+            
+            gameConfigListCache.put(CacheConstants.ALL_COMBINATIONS, allCombinations);
+            logger.info("成功设置全量配置组合缓存: {} 个", allCombinations.size());
+            
+            gameConfigListCache.put(CacheConstants.ALL_COMBINATIONS_ACTIVE, activeCombinations);
+            logger.info("成功设置激活配置组合缓存: {} 个", activeCombinations.size());
+            
+            logger.info("配置组合缓存预热完成: 全量 {} 个, 激活 {} 个", allCombinations.size(), activeCombinations.size());
+        } catch (Exception e) {
+            logger.error("配置组合缓存预热失败", e);
+            throw new RuntimeException("配置组合缓存预热失败", e);
+        }
+        
+        logger.info("手动预热基础配置列表完成");
     }
 } 

@@ -69,6 +69,8 @@ public class SecurityConfig {
                 .requestMatchers("api/players/**").permitAll()
                 .requestMatchers("/api/friends/**").permitAll()
                 .requestMatchers("/hello").permitAll()
+                .requestMatchers("/api/config/**").permitAll()
+                .requestMatchers("/api/game-config/**").permitAll()
                 .anyRequest().authenticated() // 其他请求需要身份验证
             )
             // 添加 session 管理，设置为无状态，Spring Security将不会为每个请求创建会话，而是依赖于客户端提供的令牌（如JWT）来验证用户身份

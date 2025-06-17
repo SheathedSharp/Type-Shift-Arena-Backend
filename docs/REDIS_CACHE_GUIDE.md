@@ -19,10 +19,10 @@
 
 3. **缓存键设计**
    ```
-   game_config_::mode:RANKED
+   game_config_::mode:CLASSIC
    game_config_::language:name:CHINESE
    game_config_list::all_modes
-   game_config_combination::combination:RANKED:CHINESE:LITERATURE:EASY
+   game_config_combination::combination:CLASSIC:CHINESE:LITERATURE:EASY
    ```
 
 ## 配置说明

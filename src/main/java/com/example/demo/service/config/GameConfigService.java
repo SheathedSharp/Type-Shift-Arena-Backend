@@ -7,10 +7,13 @@ package com.example.demo.service.config;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,8 @@ import com.example.demo.repository.config.*;
 @Service
 @Transactional
 public class GameConfigService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GameConfigService.class);
 
     @Autowired
     private GameModeRepository gameModeRepository;
@@ -37,12 +42,21 @@ public class GameConfigService {
     
     @Autowired
     private GameConfigCombinationRepository gameConfigCombinationRepository;
+    
+    @Autowired
+    @Lazy
+    private GameConfigCacheWarmupService cacheWarmupService;
 
     // =========================== 游戏模式管理 ===========================
     
-    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES + "'")
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES_ACTIVE + "'")
     public List<GameMode> getAllActiveModes() {
         return gameModeRepository.findAllActiveOrderBySortOrder();
+    }
+    
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES + "'")
+    public List<GameMode> getAllModes() {
+        return gameModeRepository.findAllByOrderBySortOrder();
     }
     
     @Cacheable(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.MODE_PREFIX + "' + #name")
@@ -51,6 +65,7 @@ public class GameConfigService {
     }
     
     @Caching(evict = {
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES_ACTIVE + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
     })
@@ -59,17 +74,28 @@ public class GameConfigService {
     }
     
     @Caching(evict = {
-        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.MODE_PREFIX + "' + #mode.name"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES + "'"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
+        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.MODE_PREFIX + "' + #mode.name", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES_ACTIVE + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true, beforeInvocation = true)
     })
     public GameMode updateMode(GameMode mode) {
-        return gameModeRepository.save(mode);
+        GameMode updatedMode = gameModeRepository.save(mode);
+        
+        // 通知缓存预热服务重新加载缓存
+        try {
+            cacheWarmupService.manualWarmup();
+        } catch (Exception e) {
+            logger.warn("缓存重新加载失败，但不影响主业务: {}", e.getMessage());
+        }
+        
+        return updatedMode;
     }
     
     @Caching(evict = {
         @CacheEvict(value = CacheConstants.GAME_CONFIG, allEntries = true),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES + "'"),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_MODES_ACTIVE + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
     })
     public void deleteMode(String id) {
@@ -78,9 +104,14 @@ public class GameConfigService {
 
     // =========================== 游戏语言管理 ===========================
     
-    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES + "'")
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES_ACTIVE + "'")
     public List<GameLanguage> getAllActiveLanguages() {
         return gameLanguageRepository.findAllActiveOrderBySortOrder();
+    }
+    
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES + "'")
+    public List<GameLanguage> getAllLanguages() {
+        return gameLanguageRepository.findAllByOrderBySortOrder();
     }
     
     @Cacheable(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.LANGUAGE_PREFIX + "name:' + #name")
@@ -95,6 +126,7 @@ public class GameConfigService {
     
     @Caching(evict = {
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES + "'"),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES_ACTIVE + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
     })
     public GameLanguage createLanguage(GameLanguage language) {
@@ -102,18 +134,29 @@ public class GameConfigService {
     }
     
     @Caching(evict = {
-        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.LANGUAGE_PREFIX + "name:' + #language.name"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.LANGUAGE_PREFIX + "code:' + #language.code"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES + "'"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
+        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.LANGUAGE_PREFIX + "name:' + #language.name", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.LANGUAGE_PREFIX + "code:' + #language.code", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES_ACTIVE + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true, beforeInvocation = true)
     })
     public GameLanguage updateLanguage(GameLanguage language) {
-        return gameLanguageRepository.save(language);
+        GameLanguage updatedLanguage = gameLanguageRepository.save(language);
+        
+        // 通知缓存预热服务重新加载缓存
+        try {
+            cacheWarmupService.manualWarmup();
+        } catch (Exception e) {
+            logger.warn("缓存重新加载失败，但不影响主业务: {}", e.getMessage());
+        }
+        
+        return updatedLanguage;
     }
     
     @Caching(evict = {
         @CacheEvict(value = CacheConstants.GAME_CONFIG, allEntries = true),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES + "'"),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_LANGUAGES_ACTIVE + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
     })
     public void deleteLanguage(String id) {
@@ -122,9 +165,14 @@ public class GameConfigService {
 
     // =========================== 游戏类型管理 ===========================
     
-    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES + "'")
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES_ACTIVE + "'")
     public List<GameCategory> getAllActiveCategories() {
         return gameCategoryRepository.findAllActiveOrderBySortOrder();
+    }
+    
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES + "'")
+    public List<GameCategory> getAllCategories() {
+        return gameCategoryRepository.findAllByOrderBySortOrder();
     }
     
     @Cacheable(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.CATEGORY_PREFIX + "' + #name")
@@ -134,24 +182,36 @@ public class GameConfigService {
     
     @Caching(evict = {
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES + "'"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES_ACTIVE + "'"),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)  
     })
     public GameCategory createCategory(GameCategory category) {
         return gameCategoryRepository.save(category);
     }
     
     @Caching(evict = {
-        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.CATEGORY_PREFIX + "' + #category.name"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES + "'"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
+        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.CATEGORY_PREFIX + "' + #category.name", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES_ACTIVE + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true, beforeInvocation = true)
     })
     public GameCategory updateCategory(GameCategory category) {
-        return gameCategoryRepository.save(category);
+        GameCategory updatedCategory = gameCategoryRepository.save(category);
+        
+        // 通知缓存预热服务重新加载缓存
+        try {
+            cacheWarmupService.manualWarmup();
+        } catch (Exception e) {
+            logger.warn("缓存重新加载失败，但不影响主业务: {}", e.getMessage());
+        }
+        
+        return updatedCategory;
     }
     
     @Caching(evict = {
         @CacheEvict(value = CacheConstants.GAME_CONFIG, allEntries = true),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES + "'"),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_CATEGORIES_ACTIVE + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
     })
     public void deleteCategory(String id) {
@@ -160,9 +220,14 @@ public class GameConfigService {
 
     // =========================== 游戏难度管理 ===========================
     
-    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES + "'")
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES_ACTIVE + "'")
     public List<GameDifficulty> getAllActiveDifficulties() {
         return gameDifficultyRepository.findAllActiveOrderByLevelValue();
+    }
+    
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES + "'")
+    public List<GameDifficulty> getAllDifficulties() {
+        return gameDifficultyRepository.findAllByOrderBySortOrder();
     }
     
     @Cacheable(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.DIFFICULTY_PREFIX + "' + #name")
@@ -172,6 +237,7 @@ public class GameConfigService {
     
     @Caching(evict = {
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES + "'"),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES_ACTIVE + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
     })
     public GameDifficulty createDifficulty(GameDifficulty difficulty) {
@@ -179,17 +245,28 @@ public class GameConfigService {
     }
     
     @Caching(evict = {
-        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.DIFFICULTY_PREFIX + "' + #difficulty.name"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES + "'"),
-        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
+        @CacheEvict(value = CacheConstants.GAME_CONFIG, key = "'" + CacheConstants.DIFFICULTY_PREFIX + "' + #difficulty.name", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES_ACTIVE + "'", beforeInvocation = true),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true, beforeInvocation = true)
     })
     public GameDifficulty updateDifficulty(GameDifficulty difficulty) {
-        return gameDifficultyRepository.save(difficulty);
+        GameDifficulty updatedDifficulty = gameDifficultyRepository.save(difficulty);
+        
+        // 通知缓存预热服务重新加载缓存
+        try {
+            cacheWarmupService.manualWarmup();
+        } catch (Exception e) {
+            logger.warn("缓存重新加载失败，但不影响主业务: {}", e.getMessage());
+        }
+        
+        return updatedDifficulty;
     }
     
     @Caching(evict = {
         @CacheEvict(value = CacheConstants.GAME_CONFIG, allEntries = true),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES + "'"),
+        @CacheEvict(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_DIFFICULTIES_ACTIVE + "'"),
         @CacheEvict(value = CacheConstants.GAME_CONFIG_COMBINATION, allEntries = true)
     })
     public void deleteDifficulty(String id) {
@@ -198,9 +275,14 @@ public class GameConfigService {
 
     // =========================== 配置组合管理 ===========================
     
-    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_COMBINATIONS + "'")
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_COMBINATIONS_ACTIVE + "'")
     public List<GameConfigCombination> getAllActiveCombinations() {
         return gameConfigCombinationRepository.findAllActive();
+    }
+    
+    @Cacheable(value = CacheConstants.GAME_CONFIG_LIST, key = "'" + CacheConstants.ALL_COMBINATIONS + "'")
+    public List<GameConfigCombination> getAllCombinations() {
+        return gameConfigCombinationRepository.findAll();
     }
     
     @Cacheable(value = CacheConstants.GAME_CONFIG_COMBINATION, 
@@ -254,4 +336,6 @@ public class GameConfigService {
     public List<GameConfigCombination> getCombinationsByCategoryAndDifficulty(String categoryName, String difficultyName) {
         return gameConfigCombinationRepository.findByCategoryNameAndDifficultyName(categoryName, difficultyName);
     }
+    
+
 } 
